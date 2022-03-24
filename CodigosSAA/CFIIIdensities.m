@@ -1,6 +1,6 @@
 function [rho_f,rho_fairing,rho_w,rho_HTP,rho_VTP,rho_tb]=CFIIIdensities
 
-% Datos Céfiro III
+% Datos CÃ©firo III
 S_w = 2.200000000000000;
 S_w_e = 2.050131939508261;
 b_w = 5.225930044268314;
