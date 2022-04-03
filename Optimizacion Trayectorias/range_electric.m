@@ -44,10 +44,10 @@ P = @(V,n) CP(V,n)*N_eng*rho*n^3*D^5;
 
 %% Range
 
-xf = @(V,n) eta_m*E*V/((1-tau)*P(V,n))*1e-3;
+xf = @(V,n)  eta_m*E*V/((1-tau)*P(V,n))*1e-3;
 
 %% Generate numerical Matrix
-Nmat = 20;
+Nmat = 1000;
 Vlin = linspace(20,40,Nmat);
 nlin = linspace(40,100, Nmat);
 
@@ -58,7 +58,7 @@ for  ii = 1: Nmat
     % Loop in revolutions
     for jj = 1:Nmat
         
-        xfmat(ii,jj) = xf(Vlin(ii),nlin(jj));
+        xfmat(ii,jj) = xf(Vlin(jj),nlin(ii));
         
     end
 end
@@ -75,37 +75,37 @@ for kk = 1:Nmat
 end
 
 %% Eliminate zeros from indeterminations (points where CP = 0)
-
-threshold = 1e2; % Assume Range < 100 km 
+xfmat  = xfmat';
+threshold = 2e2; % Assume Range < 200 km 
 xfmat(xfmat > threshold) = 0;
 xfmat(xfmat < 0) = 0;
 
 
 %% Plot contours
-N_contour_lines = 15; % Number of contour lines
+N_contour_lines = 10; % Number of contour lines
 vect_cc_xf = linspace(min(min(xfmat)),max(max(xfmat)),N_contour_lines);
 
 
  figure(1)
-[xf_c,h_xfmat_c] = contourf(Vlin,nlin,xfmat,vect_cc_xf');
+[xf_c,h_xfmat_c] = contourf(nlin,Vlin,xfmat,vect_cc_xf');
        clabel(xf_c,h_xfmat_c)
        colormap(flipud(colormap('gray')))
          grid on
          Title1 = strcat('Range (km) vs. V [m/s] & Engine revolutions [rps]');
          title(Title1)
-         xlabel('V [m/s]')
-         ylabel(' Engine revolutions [rps]')
+         xlabel('Engine revolutions [rps] ')
+         ylabel('V [m/s]')
          sidebar = colorbar;  %%%%%%%%%%%%%%%%%%%
          sidebar.Label.FontSize = 11;   %%%%%%%%%%%%%%%%%%%
          sidebar.Label.FontWeight = 'bold';   %%%%%%%%%%%%%%%%%%%
          sidebar.Label.Position(1) = 2;   %%%%%%%%%%%%%%%%%%%
         caxis([min(min(xfmat)) max(max(xfmat))]); %%%%%%%%%%%%%%%
          hold on 
-         plot(Vlin,nconlin,'--r','LineWidth',2)
+         plot(nconlin,Vlin,'--r','LineWidth',2)
          legend('x_f (V,n)','T = D constrain')
          
-figure(2)
-
-mesh(Vlin,nlin,xfmat)
-
+% figure(2)
+% 
+% mesh(Vlin,nlin,xfmat)
+% 
 
