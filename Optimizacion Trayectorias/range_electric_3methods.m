@@ -44,6 +44,10 @@ E     = e0*mbatt;  %[J] Total energy of the battery packs
 N_eng = 2; % Number of engines
 D     = 0.7112; % Propeller Diameter [m]
 
+RPMMAX_APC = 150000; % Max RPM of AXI motors 
+D_inches = D*1000/25.4; % Diameter in inches
+rps_max = RPMMAX_APC/(D_inches*60); % Max rps of the AXI motors w.r.t. the diameter
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -132,6 +136,7 @@ X0 = 25;
 ncon_A = @(V) -(1/2)*(CT1*N_eng*S_ref*D*V^2*rho-sqrt(-4*CT0*CT2*D^2*N_eng^2*S_ref^2*V^4*rho^2+CT1^2*D^2*N_eng^2*S_ref^2*V^4*rho^2+2*CD0*CT0*N_eng*S_ref^3*V^4*rho^2+...
     8*CT0*N_eng*S_ref*W^2*CD2))/(CT0*N_eng*S_ref*rho*V*D^2);
 
+% Calculate the revolutions from the T = D restriction
 nsol_A = ncon_A(Vsol);
 
 
@@ -165,6 +170,12 @@ Vsol_fmincon = Xsol_fmincon(1);
 %% This maximum considers the stall limitation
 xf_max_fmin       = -xf_fmincon (Xsol_fmincon);
 
+
+
+%%%%%%
+% Now everything is solved!! We only need to plot the results
+%%%%%%
+
 %% Plot contours
 N_contour_lines = 10; % Number of contour lines
 vect_cc_xf = linspace(min(min(xfmat)),max(max(xfmat)),N_contour_lines);
@@ -187,9 +198,10 @@ vect_cc_xf = linspace(min(min(xfmat)),max(max(xfmat)),N_contour_lines);
          hold on 
          plot(nconlin,Vlin,'--r','LineWidth',2)
          yline(Vstall,'-.b','LineWidth',2)
+         xline(rps_max,':b','LineWidth',2)
          plot(nsol_A,Vsol,'*g','LineWidth',2)
          plot(nsol_fmincon,Vsol_fmincon,'om','LineWidth',2.5)
-         legend('x_f (V,n)','T = D constrain','Stall Speed','Optimal solution no-stall','Optimal solution stall','Location','northwest')
+         legend('x_f (V,n)','T = D constrain','Stall Speed','Max RPS','Optimal solution no-stall','Optimal solution stall','Location','northwest')
 
 % figure(2)
 % 
@@ -208,6 +220,10 @@ CL_max_w1_CR_ope = CL_max_w1_CR/Safety_F;
 
 N_eng = 2; % Number of engines
 D     = 0.7112; % Propeller Diameter [m]
+RPMMAX_APC = 150000; % Max RPM of AXI motors 
+D_inches = D*1000/25.4; % Diameter in inches
+rps_max = RPMMAX_APC/(D_inches*60); % Max rps of the AXI motors w.r.t. the diameter
+
 
 
 CT0 =  0.089050757500461;
@@ -228,8 +244,8 @@ CD2 = 0.054209627025009;
 %X(1) = V
 %X(2) = n
 
-% Stall speed condition
-c  = sqrt(2*W/(rho*S_ref*CL_max_w1_CR_ope))-X(1); 
+% [Stall speed condition; Max RPS condition]s
+c  = [+sqrt(2*W/(rho*S_ref*CL_max_w1_CR_ope))-X(1);rps_max]; 
 
 % T = D condition
 ceq = N_eng*rho*(CT2*X(1)^2/(X(2)^2*D^2)+CT1*X(1)/(X(2)*D)+CT0)*X(2)^2*D^4 ... 
