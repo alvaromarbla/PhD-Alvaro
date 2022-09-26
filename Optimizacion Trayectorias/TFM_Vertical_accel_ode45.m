@@ -2,7 +2,7 @@
 
 %% Use of ode45 commands
 clear all
-%close all
+close all
 %% Set deltaH (altitude difference)
 global deltaH
 deltaH = 100; %[m]
@@ -19,7 +19,9 @@ rho   = 1.225; % Air density [kg/m^3]
 RPMMAX_APC = 150000; % Max RPM of AXI motors
 D_inches   = D*1000/25.4; % Diameter in inches
 rps_max    = RPMMAX_APC/(D_inches*60); % Max rps of the AXI motors w.r.t. the diameter
+Pmax_Eng = 6.7e3; % Max Power per engine [kW]
 
+Pmax = N_eng*Pmax_Eng;
 %% Electric
 tau = 0.2;
 eta_m = 0.88*0.98*0.95; % Engine and electrical efficiency
@@ -55,7 +57,10 @@ t_mat = zeros(Tlin,Nlin);
 P_mat = zeros(Tlin,Nlin);
 E_v   = zeros(1,Nlin);
 E_dist = zeros(Tlin,Nlin);
+E_perc = zeros(Tlin,Nlin);
+
 E_dist(1,:) = E_batt;
+E_perc(1,:) = 100;
 
 %% Solve system for each rps
 for ii = 1:Nlin
@@ -83,7 +88,7 @@ for ii = 1:Nlin
     %% To calculate Energy distribution over time
     for jj = 2:Tlin
         E_dist(jj,ii) = E_batt - trapz(t_mat(1:jj,ii),P_mat(1:jj,ii))/((1-tau)*eta_m);
-        
+        E_perc(jj,ii) = E_dist(jj,ii)/E_batt *100;
     end
     
 end
@@ -186,6 +191,39 @@ title(Title3)
 xlabel('Climb time [s] ')
 ylabel('E [J]')
 caxis([min(min(nmat)) max(max(nmat))]); %%%%%%%%%%%%%%%
+
+figure(6)
+[n_c4,Eper_nmat_c] = contourf([t_mat(:,1:indexminE-1) t_mat(:,indexminE+1:Nlin)],...
+    [E_perc(:,1:indexminE-1) E_perc(:,indexminE+1:Nlin)],[nmat(:,1:indexminE-1) nmat(:,indexminE+1:Nlin)],[vect_cc_n(1:indexminE-1); vect_cc_n(indexminE+1:Nlin)],'k','LineWidth',1.5);
+clabel(n_c4,Eper_nmat_c)
+colormap(flipud(colormap('white')))
+hold on
+plot (t_mat(:,indexminE),E_perc(:,indexminE),'r','LineWidth',1.5);
+grid on
+Title3 = strcat(['Energy percentage [%] vs time [s] & Engine rev. [rps]. Optimum at ' num2str(n_min) ' rps.']);
+title(Title3)
+xlabel('Climb time [s] ')
+ylabel('E [%]')
+caxis([min(min(nmat)) max(max(nmat))]); %%%%%%%%%%%%%%%
+
+
+figure(7)
+
+[n_c2,P_nmat_c] = contourf([H_mat(:,1:indexminE-1) H_mat(:,indexminE+1:Nlin)],...
+    [P_mat(:,1:indexminE-1) P_mat(:,indexminE+1:Nlin)],[nmat(:,1:indexminE-1) nmat(:,indexminE+1:Nlin)],[vect_cc_n(1:indexminE-1); vect_cc_n(indexminE+1:Nlin)],'k','LineWidth',1.5);
+clabel(n_c2,P_nmat_c)
+colormap(flipud(colormap('white')))
+hold on
+plot (H_mat(:,indexminE),P_mat(:,indexminE),'r','LineWidth',1.5);
+yline(Pmax,'-.b','LineWidth',2);
+grid on
+Title3 = strcat(['Power consumption [W] vs Height [m] & Engine rev. [rps]. Optimum at ' num2str(n_min) ' rps.']);
+title(Title3)
+xlabel('Climb height [m] ')
+ylabel('P [W]')
+caxis([min(min(nmat)) max(max(nmat))]); %%%%%%%%%%%%%%%
+
+
 %% Definition of function to be solved
 
 function dy = fun(t,y,n)

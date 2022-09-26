@@ -2,7 +2,7 @@
 clear all
 close all
 
-% This code takes as imputs:
+% This code takes as inputs:
 
     % Aerodynamic wind tunnel model // polar simplified model from previous
     % Propulsive  wind tunnel model 
@@ -44,7 +44,7 @@ CDv = CD(alphav);
 % plot(alphav*180/pi,CLv)
 % figure(2)
 % plot(alphav*180/pi,CDv)
-% 
+
 % figure(3)
 % plot(CLv,CDv)
 
@@ -88,6 +88,10 @@ RPMMAX_APC = 150000; % Max RPM of AXI motors
 D_inches = D*1000/25.4; % Diameter in inches
 rps_max = RPMMAX_APC/(D_inches*60); % Max rps of the AXI motors w.r.t. the diameter
 
+
+Pmax_Eng = 6.7e3; % Max Power per engine [kW]
+
+Pmax = N_eng*Pmax_Eng;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -127,17 +131,33 @@ for  ii = 1: Nmat
 end
 
 %% Calculate restriction T = D 
-
+%  Also calculate inequality restriction P = PMAX
 
 % Using simplified aero model
 
 ncon = @(V) -(1/2)*(CT1*N_eng*S_ref*D*V^2*rho-sqrt(-4*CT0*CT2*D^2*N_eng^2*S_ref^2*V^4*rho^2+...
     CT1^2*D^2*N_eng^2*S_ref^2*V^4*rho^2+2*CD0*CT0*N_eng*S_ref^3*V^4*rho^2+4*CD1*CT0*N_eng*S_ref^2*V^2*W*rho+8*CD2*CT0*N_eng*S_ref*W^2))/(CT0*N_eng*S_ref*rho*V*D^2);
+
+nPmax = @(V) 1/D*((1/6)*((-108*CP0^2*CP3*D^2*N_eng*V^3*rho+36*CP2*V^3*CP1*CP0*N_eng*rho*D^2-...
+    8*CP1^3*V^3*N_eng*rho*D^2+108*CP0^2*Pmax+12*sqrt(3)*sqrt(27*CP0^2*CP3^2*D^4*N_eng^2*V^6*rho^2 ...
+    -18*CP0*CP1*CP2*CP3*D^4*N_eng^2*V^6*rho^2+4*CP0*CP2^3*D^4*N_eng^2*V^6*rho^2+4*CP1^3*CP3*D^4*N_eng^2 ...
+    *V^6*rho^2-CP1^2*CP2^2*D^4*N_eng^2*V^6*rho^2-54*CP0^2*CP3*D^2*N_eng*Pmax*V^3*rho+...
+    18*CP0*CP1*CP2*D^2*N_eng*Pmax*V^3*rho-4*CP1^3*D^2*N_eng*Pmax*V^3*rho+27*CP0^2*Pmax^2)*CP0)...
+    *N_eng^2*rho^2*D)^(1/3)/(CP0*N_eng*rho*D)-(2/3)*V^2*(3*CP0*CP2-CP1^2)*N_eng*rho*D/(CP0*...
+    ((-108*CP0^2*CP3*D^2*N_eng*V^3*rho+36*CP2*V^3*CP1*CP0*N_eng*rho*D^2-8*CP1^3*V^3*N_eng*rho*...
+    D^2+108*CP0^2*Pmax+12*sqrt(3)*sqrt(27*CP0^2*CP3^2*D^4*N_eng^2*V^6*rho^2-18*CP0*CP1*CP2*CP3*D^4*N_eng^2 ...
+    *V^6*rho^2+4*CP0*CP2^3*D^4*N_eng^2*V^6*rho^2+4*CP1^3*CP3*D^4*N_eng^2*V^6*rho^2-CP1^2*CP2^2*D^4*N_eng^2 ...
+    *V^6*rho^2-54*CP0^2*CP3*D^2*N_eng*Pmax*V^3*rho+18*CP0*CP1*CP2*D^2*N_eng*Pmax*V^3*rho-4*CP1^3*D^2*N_eng...
+    *Pmax*V^3*rho+27*CP0^2*Pmax^2)*CP0)*N_eng^2*rho^2*D)^(1/3))-(1/3)*CP1*V/CP0);
+
+
 % Preallocate matrix for speed
 nconlin = zeros(Nmat,1);
-for kk = 1:Nmat
-    nconlin (kk) = ncon(Vlin(kk));
+nPmaxlin = zeros(Nmat,1);
 
+for kk = 1:Nmat
+    nconlin  (kk) = ncon(Vlin(kk));
+    nPmaxlin (kk) = nPmax(Vlin(kk));
 end
 
 
@@ -282,8 +302,12 @@ xf_max_fmin       = -xf_fmincon (Xsol_fmincon);
 %%%%%%
 
 %% Plot contours
-N_contour_lines = 10; % Number of contour lines
-vect_cc_xf = linspace(min(min(xfmat)),max(max(xfmat)),N_contour_lines);
+N_contour_lines = 12; % Number of contour lines
+vect_cc_xf = [20,30,40,64,84,105,120,135,150,165,180];
+
+% The usual command for vect_cc_xf is below, but we use the line above
+% because we know the result (for prettier result!)
+%vect_cc_xf = linspace(min(min(xfmat)),max(max(xfmat)),N_contour_lines);
 
 
  figure(1)
@@ -303,11 +327,12 @@ vect_cc_xf = linspace(min(min(xfmat)),max(max(xfmat)),N_contour_lines);
          hold on 
          plot(nconlin,Vlin,'--r','LineWidth',2)
          plot(nconlin_full,Vlin,'-.m','LineWidth',2)
+         plot(nPmaxlin,Vlin,'-b','LineWidth',2.5)
          yline(Vstall,'-.b','LineWidth',2)
          xline(rps_max,':b','LineWidth',2)
          plot(nsol_A,Vsol,'*g','LineWidth',2)
          plot(nsol_fmincon,Vsol_fmincon,'og','LineWidth',2.5)
-         legend('x_f (V,n)','T = D constrain. App Model','T = D constrain. Full Model','Min. Operative Speed','Max RPS','Optimal solution. App Model','Optimal solution. Full Model','Location','northwest')
+         legend('x_f (V,n)','T = D constrain. App Model','T = D constrain. Full Model','Max Power constrain','Min. Operative Speed','Max RPS','Optimal solution. App Model','Optimal solution. Full Model','Location','northwest')
 
 % figure(2)
 % 
@@ -346,7 +371,8 @@ D     = 0.7112; % Propeller Diameter [m]
 RPMMAX_APC = 150000; % Max RPM of AXI motors 
 D_inches = D*1000/25.4; % Diameter in inches
 rps_max = RPMMAX_APC/(D_inches*60); % Max rps of the AXI motors w.r.t. the diameter
-
+Pmax_Eng = 6.7e3; % Max Power per engine [kW]
+Pmax = N_eng*Pmax_Eng;
 
 %% Weight
 mTOW = 21.39; % Maximum T-O Mass [kg]
@@ -365,6 +391,15 @@ CT = @(V,n) CT2*V^2/(n^2*D^2)+CT1*V/(n*D)+CT0;
 
 T = @(V,n) CT(V,n)*N_eng*rho*n^2*D^4;
 
+% Power
+
+CP0 = 0.034214580122684;
+CP1 = -0.002523708791417;
+CP2 = 0.116121898742278;
+CP3 = -0.248807360672063;
+CP = @(V,n) CP3*V^3/(n^3*D^3)+CP2*V^2/(n^2*D^2)+CP1*V/(n*D)+CP0;
+
+P = @(V,n) CP(V,n)*N_eng*rho*n^3*D^5;
 %X(1) = V
 %X(2) = n
 %X(3) = alpha
@@ -373,7 +408,7 @@ T = @(V,n) CT(V,n)*N_eng*rho*n^2*D^4;
 
 
 % [Stall speed condition; Max RPS condition]s
-c  = [+sqrt(2*W/(rho*S_ref*CL_max_w1_CR_ope))-X(1);-rps_max+X(2)]; 
+c  = [+sqrt(2*W/(rho*S_ref*CL_max_w1_CR_ope))-X(1);-rps_max+X(2);P(X(1),X(2))-Pmax]; 
 
 % T = D condition
 ceq = [ T(X(1),X(2))- 0.5*rho*X(1)^2*S_ref*X(4); 

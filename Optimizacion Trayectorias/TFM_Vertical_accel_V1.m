@@ -32,8 +32,6 @@ CP0 = 0.034214580122684;
 CP1 = -0.002523708791417;
 CP2 = 0.116121898742278;
 CP3 = -0.248807360672063;
-
-
 %% Loads and weight
 mTOW = 21.39; % Maximum T-O Mass [kg]
 g    = 9.81; % Gravity [m/s^2]
@@ -56,6 +54,14 @@ RPMMAX_APC = 150000; % Max RPM of AXI motors
 D_inches = D*1000/25.4; % Diameter in inches
 rps_max = RPMMAX_APC/(D_inches*60); % Max rps of the AXI motors w.r.t. the diameter
 
+Pmax_Eng = 6.7e3; % Max Power per engine [kW]
+
+Pmax = N_eng*Pmax_Eng;
+%% Power
+CP = @(V,n) CP3*V^3/(n^3*D^3)+CP2*V^2/(n^2*D^2)+CP1*V/(n*D)+CP0;
+
+P = @(V,n) CP(V,n)*N_eng*rho*n^3*D^5;
+
 
 %% Set deltaH (altitude difference)
 
@@ -76,7 +82,7 @@ c_int = @(n) rho*(N_eng*n^2*D^4*CT0)/mTOW-g;
 
 % Define vector for rps and deltaH:
 Nlin = 20;
-Hlin = 100;
+Hlin = 150;
 n_v      = linspace(65,rps_max,Nlin);
 % Start interpolation from known segment (IDEA)
 
@@ -87,6 +93,15 @@ V_sol = zeros(Nlin,1);
 
 H_v   = zeros(Hlin,1);
 t_v   = zeros(Hlin,Nlin);
+P_v   = zeros(Hlin,Nlin);
+nflag = zeros(Hlin,1);
+Vflag = zeros(Hlin,1);
+Hflag = zeros(Hlin,1);
+tflag = zeros(Hlin,1);
+iiflag = zeros(Hlin,1);
+jjflag = zeros(Hlin,1);
+
+
 
 V_sol(1) = 0;
 H_v  (1) = 0;
@@ -101,6 +116,15 @@ for ii = 1:Nlin
     % Start climb from H = 0
     V00 = 0;
     V_0 = 0.5;
+    
+    % This flag is for calculating the point where the Power limitation is
+    % exceeded, if it exists.
+    exceedflag = 0;
+    kk = 1;
+    
+    % To calculate Power at first instant
+    P_v(1,ii) = P(0,n_input);
+    
     for jj = 2:Hlin
         
         h_step = deltaH_v(jj)-deltaH_v(jj-1);
@@ -117,6 +141,9 @@ for ii = 1:Nlin
         
         V_sol(jj,ii) = fsolve(@(V_ev) fV_ev(V_ev,n_input)- fV_ev(V00,n_input) - h_step,V_0,options);
         
+        P_v (jj,ii) = P(V_sol(jj,ii),n_input);
+        
+        
         
         % For the next step, we start from a higher speed
         V00 = V_sol(jj,ii);
@@ -124,6 +151,20 @@ for ii = 1:Nlin
         V_0 = V_sol(jj,ii);
         H_v (jj) = h_step + H_v(jj-1);
         t_v (jj,ii) = h_step/V_sol(jj,ii) + t_v(jj-1,ii);
+        
+        %% We account if the mission is feasible in terms of Power
+        if P_v(jj,ii) > Pmax && exceedflag == 0
+            nflag(kk) = n_input;
+            Vflag(kk) = V_sol(jj,ii);
+            Hflag(kk) = H_v (jj);
+            tflag(kk) = t_v (kk);
+            iiflag(kk) = ii;
+            jjflag(kk) = jj;
+            exceedflag = 1;
+            kk = kk+1;
+            warning('POWER has been Exceeded')
+        end
+        
     end
     
 end
@@ -136,10 +177,10 @@ VF_sol = V_sol(end,:)';
 
 % Define the constants of the Power function
 
-ap_int = rho*N_eng*CP3*D^2/eta_m/(1-tau); 
-bp_int = @(n) rho*N_eng*CP2*n*D^3/eta_m/(1-tau); 
-cp_int = @(n) rho*N_eng*CP1*n^2*D^4/eta_m/(1-tau); 
-dp_int = @(n) rho*N_eng*CP0*n^3*D^5/eta_m/(1-tau); 
+ap_int = rho*N_eng*CP3*D^2/eta_m/(1-tau);
+bp_int = @(n) rho*N_eng*CP2*n*D^3/eta_m/(1-tau);
+cp_int = @(n) rho*N_eng*CP1*n^2*D^4/eta_m/(1-tau);
+dp_int = @(n) rho*N_eng*CP0*n^3*D^5/eta_m/(1-tau);
 
 
 f_Energy = @(V_E,n)-((-a_int^2*cp_int(n)+a_int*b_int(n)*bp_int(n)+a_int*c_int(n)*ap_int-b_int(n)^2*ap_int)*log(abs(a_int*V_E^2+b_int(n)*V_E+c_int(n))))/...
@@ -149,9 +190,9 @@ f_Energy = @(V_E,n)-((-a_int^2*cp_int(n)+a_int*b_int(n)*bp_int(n)+a_int*c_int(n)
 
 E_v = zeros(Nlin,1);
 for ii = 1:Nlin
-   
-   E_v (ii) =   f_Energy(VF_sol(ii),n_v(ii))-f_Energy(0,n_v(ii));
-   
+    
+    E_v (ii) =   f_Energy(VF_sol(ii),n_v(ii))-f_Energy(0,n_v(ii));
+    
     
 end
 
@@ -177,6 +218,7 @@ figure(1)
 clabel(n_c,h_nmat_c)
 hold on
 plot (Hmat(:,indexminE),V_sol(:,indexminE),'r','LineWidth',1.5);
+plot (Hflag,Vflag,'sm');
 colormap(flipud(colormap('white')))
 grid on
 Title1 = strcat(['Vertical speed [m/s] vs Height [m] & Engine rev. [rps]. Optimum at ' num2str(n_min) ' rps.']);
@@ -207,6 +249,7 @@ clabel(n_c2,t_nmat_c)
 colormap(flipud(colormap('white')))
 hold on
 plot (tmat(:,indexminE),V_sol(:,indexminE),'r','LineWidth',1.5);
+plot (tflag,Vflag,'sm','LineWidth',1.5);
 grid on
 Title3 = strcat(['Vertical speed [m/s] vs time [s] & Engine rev. [rps]. Optimum at ' num2str(n_min) ' rps.']);
 title(Title3)
@@ -223,16 +266,31 @@ clabel(n_c3,ht_nmat_c)
 colormap(flipud(colormap('gray')))
 hold on
 plot (tmat(:,indexminE),Hmat(:,indexminE),'r','LineWidth',1.5);
+plot (tflag,Hflag,'sm','LineWidth',1.5);
+
 grid on
 Title3 = strcat(['Climb height [m] vs time [s] & Engine rev. [rps]. Optimum at ' num2str(n_min) ' rps.']);
 title(Title3)
 xlabel('Climb time [s] ')
 ylabel('Climb height [m]')
-         sidebar = colorbar;  %%%%%%%%%%%%%%%%%%%
-         sidebar.Label.FontSize = 11;   %%%%%%%%%%%%%%%%%%%
-         sidebar.Label.FontWeight = 'bold';   %%%%%%%%%%%%%%%%%%%
-         sidebar.Label.Position(1) = 2;   %%%%%%%%%%%%%%%%%%%
-        caxis([min(min(nmat)) 1.2*max(max(nmat))]); %%%%%%%%%%%%%%%
+sidebar = colorbar;  %%%%%%%%%%%%%%%%%%%
+sidebar.Label.FontSize = 11;   %%%%%%%%%%%%%%%%%%%
+sidebar.Label.FontWeight = 'bold';   %%%%%%%%%%%%%%%%%%%
+sidebar.Label.Position(1) = 2;   %%%%%%%%%%%%%%%%%%%
+caxis([min(min(nmat)) 1.2*max(max(nmat))]); %%%%%%%%%%%%%%%
 
-
+figure(5)
+[n_c,P_nmat_c] = contourf([Hmat(:,1:indexminE-1) Hmat(:,indexminE+1:Nlin)],...
+    [P_v(:,1:indexminE-1) P_v(:,indexminE+1:Nlin)],[nmat(:,1:indexminE-1) nmat(:,indexminE+1:Nlin)],[vect_cc_n(1:indexminE-1); vect_cc_n(indexminE+1:Nlin)],'k','LineWidth',1.5);
+clabel(n_c,P_nmat_c)
+hold on
+plot (Hmat(:,indexminE),P_v(:,indexminE),'r','LineWidth',1.5);
+yline(Pmax,'-.b','LineWidth',2);
+colormap(flipud(colormap('white')))
+grid on
+Title1 = strcat(['Power consumption [W] vs Height [m] & Engine rev. [rps]. Optimum at ' num2str(n_min) ' rps.']);
+title(Title1)
+xlabel('Climb height [m] ')
+ylabel('Power [W]')
+caxis([min(min(nmat)) max(max(nmat))]); %%%%%%%%%%%%%%%
 

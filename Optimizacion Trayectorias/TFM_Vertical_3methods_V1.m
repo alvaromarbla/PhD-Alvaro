@@ -55,6 +55,10 @@ RPMMAX_APC = 150000; % Max RPM of AXI motors
 D_inches = D*1000/25.4; % Diameter in inches
 rps_max = RPMMAX_APC/(D_inches*60); % Max rps of the AXI motors w.r.t. the diameter
 
+Pmax_Eng = 6.7e3; % Max Power per engine [kW]
+
+Pmax = N_eng*Pmax_Eng;
+
 
 %% Set deltaH (altitude difference)
 
@@ -94,14 +98,30 @@ end
 
 %% Calculate restriction T = D + W
 
-ncon = @(V,alpha) -(1/2)*(CT1*N_eng*V*rho*D-sqrt(-4*CT0*CT2*D^2*N_eng^2*V^2*rho^2+CT1^2*D^2*N_eng^2*V^2*rho^2+2*CD(alpha)*CT0*N_eng*S*V^2*rho^2+4*CT0*N_eng*W*rho))/(CT0*N_eng*rho*D^2)
+% Using simplified aero model
+ncon = @(V,alpha) -(1/2)*(CT1*N_eng*V*rho*D-sqrt(-4*CT0*CT2*D^2*N_eng^2*V^2*rho^2+CT1^2*D^2*N_eng^2*V^2*rho^2+2*CD(alpha)*CT0*N_eng*S*V^2*rho^2+4*CT0*N_eng*W*rho))/(CT0*N_eng*rho*D^2);
+
+% Also calculate max power constrain
+
+nPmax = @(V) 1/D*((1/6)*((-108*CP0^2*CP3*D^2*N_eng*V^3*rho+36*CP2*V^3*CP1*CP0*N_eng*rho*D^2-...
+    8*CP1^3*V^3*N_eng*rho*D^2+108*CP0^2*Pmax+12*sqrt(3)*sqrt(27*CP0^2*CP3^2*D^4*N_eng^2*V^6*rho^2 ...
+    -18*CP0*CP1*CP2*CP3*D^4*N_eng^2*V^6*rho^2+4*CP0*CP2^3*D^4*N_eng^2*V^6*rho^2+4*CP1^3*CP3*D^4*N_eng^2 ...
+    *V^6*rho^2-CP1^2*CP2^2*D^4*N_eng^2*V^6*rho^2-54*CP0^2*CP3*D^2*N_eng*Pmax*V^3*rho+...
+    18*CP0*CP1*CP2*D^2*N_eng*Pmax*V^3*rho-4*CP1^3*D^2*N_eng*Pmax*V^3*rho+27*CP0^2*Pmax^2)*CP0)...
+    *N_eng^2*rho^2*D)^(1/3)/(CP0*N_eng*rho*D)-(2/3)*V^2*(3*CP0*CP2-CP1^2)*N_eng*rho*D/(CP0*...
+    ((-108*CP0^2*CP3*D^2*N_eng*V^3*rho+36*CP2*V^3*CP1*CP0*N_eng*rho*D^2-8*CP1^3*V^3*N_eng*rho*...
+    D^2+108*CP0^2*Pmax+12*sqrt(3)*sqrt(27*CP0^2*CP3^2*D^4*N_eng^2*V^6*rho^2-18*CP0*CP1*CP2*CP3*D^4*N_eng^2 ...
+    *V^6*rho^2+4*CP0*CP2^3*D^4*N_eng^2*V^6*rho^2+4*CP1^3*CP3*D^4*N_eng^2*V^6*rho^2-CP1^2*CP2^2*D^4*N_eng^2 ...
+    *V^6*rho^2-54*CP0^2*CP3*D^2*N_eng*Pmax*V^3*rho+18*CP0*CP1*CP2*D^2*N_eng*Pmax*V^3*rho-4*CP1^3*D^2*N_eng...
+    *Pmax*V^3*rho+27*CP0^2*Pmax^2)*CP0)*N_eng^2*rho^2*D)^(1/3))-(1/3)*CP1*V/CP0);
+
 % Preallocate matrix for speed
 nconlin = zeros(Nmat,1);
-
+nPmaxlin = zeros(Nmat,1);
 
 for kk = 1:Nmat
     nconlin (kk) = ncon(Vlin(kk),alpha_V);
-
+    nPmaxlin (kk) = nPmax(Vlin(kk));
 end
 
 
@@ -205,8 +225,13 @@ E_min_fmin       = E_v_fmincon (Xsol_fmincon);
 %%%%%%
 
 %% Plot contours
-N_contour_lines = 12; % Number of contour lines
-vect_cc_E = linspace(min(min(Ev_mat)),max(max(Ev_mat)),N_contour_lines);
+N_contour_lines = 10; % Number of contour lines
+%vect_cc_E = linspace(min(min(Ev_mat)),max(max(Ev_mat)),N_contour_lines);
+vect_cc_E = [1818,3636,5454,7272,9091,12107,14545,16363,18181];
+
+% The usual command for vect_cc_E is below, but we use the line above
+% because we know the result (for prettier result!)
+%vect_cc_E = linspace(min(min(Ev_mat)),max(max(Ev_mat)),N_contour_lines);
 
 
  figure(1)
@@ -222,15 +247,16 @@ vect_cc_E = linspace(min(min(Ev_mat)),max(max(Ev_mat)),N_contour_lines);
          sidebar.Label.FontSize = 11;   %%%%%%%%%%%%%%%%%%%
          sidebar.Label.FontWeight = 'bold';   %%%%%%%%%%%%%%%%%%%
          sidebar.Label.Position(1) = 2;   %%%%%%%%%%%%%%%%%%%
-        caxis([min(min(Ev_mat)) max(max(Ev_mat))]); %%%%%%%%%%%%%%%
+         caxis([min(min(Ev_mat)) max(max(Ev_mat))]); %%%%%%%%%%%%%%%
          hold on 
          plot(nconlin,Vlin,'--r','LineWidth',2) % plot constrain
+         plot(nPmaxlin,Vlin,'-b','LineWidth',2.5)
          xline(rps_max,':b','LineWidth',2)
          plot(nsol_A,Vsol,'*g','LineWidth',2)
          plot(nsol_fmincon,Vsol_fmincon,'om','LineWidth',2.5)
-         legend('E (V,n)','T = D + W constrain','Max RPS','Optimal solution Analytical','Optimal solution Fmincon','Location','northwest')
+         legend('E (V,n)','T = D + W constrain','Max Power constrain','Max RPS','Optimal solution Analytical','Optimal solution Fmincon','Location','northwest')
 
-         battery_vo = E_min_fmin/e0
+         battery_vo = E_min_fmin/e0*100
 
 
 
@@ -242,11 +268,8 @@ D     = 0.7112; % Propeller Diameter [m]
 RPMMAX_APC = 150000; % Max RPM of AXI motors 
 D_inches = D*1000/25.4; % Diameter in inches
 rps_max = RPMMAX_APC/(D_inches*60); % Max rps of the AXI motors w.r.t. the diameter
-
-
-CT0 =  0.089050757500461;
-CT1 = -0.026659496766654;
-CT2 = -0.162620845549081; 
+Pmax_Eng = 6.7e3; % Max Power per engine [kW]
+Pmax = N_eng*Pmax_Eng;
 
 %% Loads and weights
 
@@ -256,6 +279,23 @@ W     = mTOW*g;
 
 S = 0.430279179101; % Reference surface [m^2]
 rho   = 1.225;
+
+% Thrust
+CT0 =  0.089050757500461;
+CT1 = -0.026659496766654;
+CT2 = -0.162620845549081; 
+
+% Power
+
+CP0 = 0.034214580122684;
+CP1 = -0.002523708791417;
+CP2 = 0.116121898742278;
+CP3 = -0.248807360672063;
+CP = @(V,n) CP3*V^3/(n^3*D^3)+CP2*V^2/(n^2*D^2)+CP1*V/(n*D)+CP0;
+
+P = @(V,n) CP(V,n)*N_eng*rho*n^3*D^5;
+
+
 
 %% Drag model
 alpha_V = -90; % [º] Because of Vertical TO
@@ -271,7 +311,7 @@ CD_V = CD(alpha_V);
 
 
 
-c  = [-X(1);-X(2);-rps_max+X(2)]; 
+c  = [-X(1);-X(2);-rps_max+X(2);P(X(1),X(2))-Pmax]; 
 
 % T = D condition
 ceq = N_eng*rho*X(2)^2*D^4*(CT2*X(1)^2/(X(2)^2*D^2)+CT1*X(1)/(X(2)*D)+CT0)-(1/2)*rho*X(1)^2*S*CD_V-W;
