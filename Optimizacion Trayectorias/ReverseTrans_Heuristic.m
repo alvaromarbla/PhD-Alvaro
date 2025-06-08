@@ -195,16 +195,28 @@ xlabel('t [s]')
 ylabel('V [m/s]')
 legend('Velocity profile','Engine Tilt breakpoint','Location','northwest')
 
-figure(3)
-plot(t_vec,E_vec,'LineWidth',1.5)
+hFIG3 = figure(3)
+fname = "Rev_trans_Eperc";
+plot(t_vec,E_vec/E_batt*100,'LineWidth',1.5)
 hold on
 grid on
-plot(t_break,E_vec(t_index),'or','LineWidth',1.5)
-Title1 = strcat('Time [s] vs Energy [J].');
+plot(t_break,E_vec(t_index)/E_batt*100,'or','LineWidth',1.5)
+Title1 = strcat('Time [s] vs Energy perc [\%].');
 title(Title1)
 xlabel('t [s]')
-ylabel('E [J]')
+ylabel('E perc [\%]')
 legend('Energy consumption profile','Engine Tilt breakpoint','Location','northwest')
+
+picturewidth = 20;
+hw_ratio = 0.65;
+set(findall(hFIG3,'-property','FontSize'),'FontSize',16)
+set(findall(hFIG3,'-property','Box'),'Box','off') % optional
+set(findall(hFIG3,'-property','Interpreter'),'Interpreter','latex') 
+set(findall(hFIG3,'-property','TickLabelInterpreter'),'TickLabelInterpreter','latex')
+set(hFIG3,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
+pos = get(hFIG3,'Position');
+set(hFIG3,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
+print(hFIG3,fname,'-dpdf','-vector','-fillpage')
 
 figure(4)
 plot(t_vec,n_vec,'LineWidth',1.5)
@@ -266,16 +278,29 @@ xlabel('x [m]')
 ylabel('Aerodynamic forces [N]')
 legend('Lift distribution over distance','Drag distribution over distance','Engine Tilt breakpoint for Lift','Engine Tilt breakpoint for Drag','Location','northwest')
 
-figure(8)
-plot(x_vec,P_vec,'LineWidth',1.5)
+hFIG8 = figure(8)
+fname = "Rev_trans_P";
+
+plot(x_vec,P_vec/1000,'LineWidth',1.5)
 hold on
 grid on
-plot(x_vec(t_index),P_vec(t_index),'or','LineWidth',1.5)
-Title1 = strcat('Horizontal distance [m] vs Power [N].');
+plot(x_vec(t_index),P_vec(t_index)/1000,'or','LineWidth',1.5)
+Title1 = strcat('Horizontal distance [m] vs Power [kW].');
 title(Title1)
 xlabel('x [m]')
-ylabel('P [W]')
-legend('Power distribution over distance','Engine Tilt breakpoint','Location','northwest')
+ylabel('P [kW]')
+legend('Power distribution over distance','Engine Tilt breakpoint','Location','north')
+
+picturewidth = 20;
+hw_ratio = 0.65;
+set(findall(hFIG8,'-property','FontSize'),'FontSize',16)
+set(findall(hFIG8,'-property','Box'),'Box','off') % optional
+set(findall(hFIG8,'-property','Interpreter'),'Interpreter','latex') 
+set(findall(hFIG8,'-property','TickLabelInterpreter'),'TickLabelInterpreter','latex')
+set(hFIG8,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
+pos = get(hFIG8,'Position');
+set(hFIG8,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
+print(hFIG8,fname,'-dpdf','-vector','-fillpage')
 
 figure(9)
 plot(x_vec,T_vec,'LineWidth',1.5)
@@ -363,7 +388,7 @@ save Mission_9.mat Mission_9
     function [phase2_cond,eps_F] = phase1_heuristicTrans (delta0, alpha_val, eps_slope, eps_0)
 
         %% Define interpolations and initial conditions
-        Tlin = 100; % Steps for time
+        Tlin = 300; % Steps for time
         tspan = linspace(0,60,Tlin);      % Interpolate time of integration
 
         y0 = [0 19.28 0 55]';               % Initial conditions. X(0) = 0, V(0) = V1,  E(0) = 0, n(0) = nCruise

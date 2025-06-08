@@ -1,0 +1,10 @@
+function J = Cruise_Objective(x, params)
+    % Unpack variables: [V, γ, α, ε, n]
+    V = x(1); alpha = x(2); epsilon = x(3); n = x(4);
+    
+    % Power consumption
+    CP = CP_Model(V, n, alpha, epsilon, params);
+    P = params.prop.num_engines * CP * params.rho * n^3 * params.prop.diameter^5/params.prop.eff;
+    
+    J = -params.prop.eff*params.E_batt*V/(P);  % Minimize the minus range 
+end

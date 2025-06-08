@@ -1,0 +1,749 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   sodipodi:docname="vtol_heur.svg"
+   inkscape:export-filename="vtol_heur.pdf"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.61647026"
+     inkscape:cx="397.42388"
+     inkscape:cy="561.25984"
+     inkscape:window-width="1920"
+     inkscape:window-height="1010"
+     inkscape:window-x="-6"
+     inkscape:window-y="-6"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g78" />
+  <defs
+     id="defs1">
+    <clipPath
+       id="clip0">
+      <rect
+         x="0"
+         y="0"
+         width="2952750"
+         height="1171575"
+         id="rect1" />
+    </clipPath>
+    <image
+       width="428"
+       height="170"
+       xlink:href="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCACqAawDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9U6KKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiqOpa5pujeX/aGoWtj5hIT7TMse7AycbiM8VFY+JtK1Ka3itdQt53uEaSAI4ImVSAzIejgZGS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1oA1ZreSXG26mhx/cCHP5qaIbeSLO66mm/3wn9FFY3/CIu1wZX13V5VJ/wBU1yFT/wAcVT+tO/4Ry9W6EkWuXcUQ/wCWWA+fqWJ/TFAGtNYpcEGSSbI/uTMn/oJFLJYxyRqhaYBem2ZwfxIOTWPJoGpSXJdtWbyuyxK6P+J3lT+CiibT9eXKQX8LRdMzD5/zVRQBsPp9rJvL28UhkADl0DFsdM561OAFGAMCufGg6mluyRaqySPwzTbpQBz90BlIPvnt0pLjw6qxyz3+qyeVHHhpWCLtjHLBmYHg4yT1HYigDZm1G1tw5e4jBQEsu4EjAyeOvSs+68WadayeWZS75xtUZOc4xjr3zwOR0zWCmreEw0bw3s2uSjD7tP8AOviuPmVnWAMF4IwWAyMAZxWhb6jfRN9n0jwq9rHnia8lhtYCgOOBGXkBxggNGOOpXpQBOut6peY+y6S6jgMbg7BnjPXBwPmGQD2IzSppes3RQ3WpJAFx8tupYn7hPPA52t/CeGNI1j4j1BR52p2elRuPnjsbYzTR8DhZpDtPIPJh6HoCM01fA9ncZOp3eoa07cSC9um8mVcEbWgj2wkYP9znAJyRmgCjdWvhjQ5fs+o6is12FV1tbi43SvgDaFgXG8nysgBSSVOKs2+veUhi0Tw1fTRk7fMMCWUSvyPmEpR9owMsqNweMkYrd0/S7LSLcwWNpBZQli5jt4ljXcTknAHUmrVAHOrH4rviDJNpOjJ91o4UkvXYcZZZD5QU4yACjDODz92np4REuDf6xq2ouuNrNdm2wPlONtuI1bJXPzAnkjocVv0UAZuk+G9I0BpG0zS7PTmkCiRrW3SMuB0yVAzj3rSoooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAztU8O6VrjRtqOm2l88YIje4hV2TOD8pIyOQOnoKqL4VW32Gy1XVbMgjcTdtc7wCTtIn8wDr1XB6DPFblFAGF/ZevWyoltrsM67iWk1KwEsh6cAxPEoHX+HvRcWfiVpmMGraTHF2WTS5XYfiLkfyrdooAw4LPxIqyedq2lSMR8hj0uVQD6nNwcj8qRdJ1y5RBd68kLK27dplksW4f3W81pf0xW7RQBhf8ACK/aFxfavqt8Ru2n7V9m2hhgj/RxHnHYtkg8g0Q+B9AimSdtItbm7UqRd3cYnnJUYUmV8uSB3JzW7RQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB/9k="
+       preserveAspectRatio="none"
+       id="img1" />
+    <clipPath
+       id="clip2">
+      <rect
+         x="0"
+         y="0"
+         width="2949612"
+         height="1171575"
+         id="rect2" />
+    </clipPath>
+    <clipPath
+       id="clip3">
+      <rect
+         x="0"
+         y="0"
+         width="2943225"
+         height="1171575"
+         id="rect3" />
+    </clipPath>
+    <clipPath
+       id="clip4">
+      <rect
+         x="0"
+         y="0"
+         width="2943225"
+         height="1169038"
+         id="rect4" />
+    </clipPath>
+    <clipPath
+       id="clip5">
+      <rect
+         x="0"
+         y="0"
+         width="2943225"
+         height="1171575"
+         id="rect5" />
+    </clipPath>
+    <clipPath
+       id="clip6">
+      <rect
+         x="0"
+         y="0"
+         width="2943225"
+         height="1169038"
+         id="rect6" />
+    </clipPath>
+    <clipPath
+       id="clip0-5">
+      <rect
+         x="0"
+         y="0"
+         width="3829050"
+         height="1171575"
+         id="rect1-8" />
+    </clipPath>
+    <image
+       width="428"
+       height="170"
+       xlink:href="data:image/jpeg;base64,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"
+       preserveAspectRatio="none"
+       id="img1-7" />
+    <clipPath
+       id="clip2-5">
+      <rect
+         x="0"
+         y="0"
+         width="2949612"
+         height="1171575"
+         id="rect2-3" />
+    </clipPath>
+    <clipPath
+       id="clip3-2">
+      <rect
+         x="0"
+         y="0"
+         width="3819525"
+         height="1171575"
+         id="rect3-8" />
+    </clipPath>
+    <clipPath
+       id="clip4-6">
+      <rect
+         x="0"
+         y="0"
+         width="2949612"
+         height="1171575"
+         id="rect4-1" />
+    </clipPath>
+    <clipPath
+       id="clip5-0">
+      <rect
+         x="0"
+         y="0"
+         width="3819525"
+         height="1171575"
+         id="rect5-5" />
+    </clipPath>
+    <clipPath
+       id="clip6-5">
+      <rect
+         x="0"
+         y="0"
+         width="2949612"
+         height="1171575"
+         id="rect6-0" />
+    </clipPath>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-4.9311055,1.5036973)"
+       id="g78">
+      <g
+         transform="matrix(0.91052707,0,0,0.91694102,14.3396,212.20591)"
+         id="g78-5">
+        <g
+           clip-path="url(#clip0-5)"
+           transform="matrix(1.04987e-4,0,0,1.04987e-4,365,518)"
+           id="g7">
+          <g
+             clip-path="url(#clip2-5)"
+             transform="matrix(1.29815,0,0,1,-0.25,0)"
+             id="g6">
+            <use
+               width="100%"
+               height="100%"
+               xlink:href="#img1-7"
+               transform="scale(6891.62)"
+               id="use6" />
+          </g>
+        </g>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(708.964,611)"
+           id="text7">𝑛</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(732.157,611)"
+           id="text8">=</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(759.564,611)"
+           id="text9">𝑛</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="20px"
+           transform="translate(774.897,616)"
+           id="text10">𝑚𝑎𝑥</text>
+        <path
+           d="M 517.987,526.5 V 456.737 H 505.5 L 525,434.5 544.5,456.737 H 532.013 V 526.5 Z"
+           stroke="#000000"
+           stroke-width="1.33333"
+           stroke-miterlimit="8"
+           fill-rule="evenodd"
+           id="path10" />
+        <g
+           clip-path="url(#clip3-2)"
+           transform="matrix(1.04987e-4,0,0,1.04987e-4,351,259)"
+           id="g11">
+          <g
+             clip-path="url(#clip4-6)"
+             transform="matrix(1.29492,0,0,1,-0.25,0)"
+             id="g10">
+            <use
+               width="100%"
+               height="100%"
+               xlink:href="#img1-7"
+               transform="scale(6891.62)"
+               id="use10" />
+          </g>
+        </g>
+        <g
+           clip-path="url(#clip5-0)"
+           transform="matrix(1.04987e-4,0,0,1.04987e-4,351,84)"
+           id="g13">
+          <g
+             clip-path="url(#clip6-5)"
+             transform="matrix(1.29492,0,0,1,-0.25,-0.0625)"
+             id="g12">
+            <use
+               width="100%"
+               height="100%"
+               xlink:href="#img1-7"
+               transform="scale(6891.62)"
+               id="use11" />
+          </g>
+        </g>
+        <path
+           d="M 517.987,251.5 V 221.2 H 505.5 l 19.5,-24.7 19.5,24.7 h -12.487 v 30.3 z"
+           stroke="#000000"
+           stroke-width="1.33333"
+           stroke-miterlimit="8"
+           fill-rule="evenodd"
+           id="path13" />
+        <path
+           d="m 552,586 v 65.203 h -2 V 586 Z m 3,63.87 -4,8 -4,-8 z"
+           id="path14" />
+        <path
+           d="M 1,-9.90457e-7 1.0001,99.3318 H -0.999902 L -1,9.90457e-7 Z M 4.0001,97.9984 1.04987e-4,105.998 -3.9999,97.9984 Z"
+           transform="matrix(1,0,0,-1,551,585.998)"
+           id="path15" />
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(584.887,495)"
+           id="text15">𝑇</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(577.54,664)"
+           id="text16">𝐷</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(596.82,664)"
+           id="text17">,</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(606.766,664)"
+           id="text18">𝑊</text>
+        <path
+           d="m 545.5,583.5 c 0,-3.314 4.029,-6 9,-6 4.971,0 9,2.686 9,6 0,3.314 -4.029,6 -9,6 -4.971,0 -9,-2.686 -9,-6 z"
+           stroke="#000000"
+           stroke-width="3"
+           stroke-miterlimit="8"
+           fill-rule="evenodd"
+           id="path18" />
+        <path
+           d="m 552,330 v 63.781 h -2 V 330 Z m 3,62.448 -4,8 -4,-8 z"
+           id="path19" />
+        <path
+           d="M 1,-1.29278e-6 1.0001,74.5433 H -0.999904 L -1,1.29278e-6 Z M 4.00009,73.21 1.04987e-4,81.21 -3.99991,73.21 Z"
+           transform="matrix(1,0,0,-1,551,332.21)"
+           id="path20" />
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(583.161,283)"
+           id="text20">𝑇</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(577.54,408)"
+           id="text21">𝐷</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(596.82,408)"
+           id="text22">,</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(606.766,408)"
+           id="text23">𝑊</text>
+        <path
+           d="m 545.5,327.5 c 0,-3.314 4.029,-6 9,-6 4.971,0 9,2.686 9,6 0,3.314 -4.029,6 -9,6 -4.971,0 -9,-2.686 -9,-6 z"
+           stroke="#000000"
+           stroke-width="3"
+           stroke-miterlimit="8"
+           fill-rule="evenodd"
+           id="path23" />
+        <path
+           d="m 551,156 v 65.203 h -2 V 156 Z m 3,63.87 -4,8 -4,-8 z"
+           id="path24" />
+        <path
+           d="M 1,-1.40642e-6 1.0001,67.9816 H -0.999904 L -1,1.40642e-6 Z M 4.00009,66.6483 l -3.999985013,8 -4.000014987,-8 z"
+           transform="matrix(1,0,0,-1,550,158.648)"
+           id="path25" />
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(583.161,66)"
+           id="text25">𝑇</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(591.168,225)"
+           id="text26">𝑊</text>
+        <path
+           d="m 543.5,153.5 c 0,-3.314 4.029,-6 9,-6 4.971,0 9,2.686 9,6 0,3.314 -4.029,6 -9,6 -4.971,0 -9,-2.686 -9,-6 z"
+           stroke="#000000"
+           stroke-width="3"
+           stroke-miterlimit="8"
+           fill-rule="evenodd"
+           id="path26" />
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(250.587,586)"
+           id="text27">ℎ</text>
+        <path
+           d="m 292.631,565.68 c 2.566,0.677 4.537,2.138 5.912,4.383 1.376,2.246 2.064,4.955 2.064,8.128 0,3.182 -0.686,5.891 -2.057,8.128 -1.371,2.237 -3.344,3.693 -5.919,4.37 l -0.317,-1.015 c 2.03,-0.677 3.54,-2.013 4.529,-4.008 0.988,-1.995 1.483,-4.531 1.483,-7.607 0,-2.97 -0.492,-5.438 -1.477,-7.402 -0.984,-1.965 -2.509,-3.285 -4.574,-3.962 z m -16.408,0 0.356,1.015 c -2.057,0.677 -3.58,1.997 -4.568,3.962 -0.989,1.964 -1.484,4.432 -1.484,7.402 0,3.076 0.495,5.612 1.484,7.607 0.988,1.995 2.498,3.331 4.528,4.008 l -0.316,1.015 c -2.575,-0.677 -4.549,-2.133 -5.92,-4.37 -1.371,-2.237 -2.056,-4.946 -2.056,-8.128 0,-3.173 0.687,-5.882 2.063,-8.128 1.375,-2.245 3.346,-3.706 5.913,-4.383 z"
+           fill-rule="evenodd"
+           id="path27" />
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(276.94,586)"
+           id="text28">0</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(310.247,586)"
+           id="text29">=</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(337.654,586)"
+           id="text30">0</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(249.474,617)"
+           id="text31">𝑉</text>
+        <path
+           d="m 293.744,596.68 c 2.566,0.677 4.537,2.138 5.913,4.383 1.375,2.246 2.063,4.955 2.063,8.128 0,3.182 -0.686,5.891 -2.057,8.128 -1.371,2.237 -3.344,3.693 -5.919,4.37 l -0.317,-1.015 c 2.031,-0.677 3.54,-2.013 4.529,-4.008 0.989,-1.995 1.483,-4.531 1.483,-7.607 0,-2.97 -0.492,-5.438 -1.476,-7.402 -0.985,-1.965 -2.51,-3.285 -4.575,-3.962 z m -16.408,0 0.356,1.015 c -2.057,0.677 -3.579,1.997 -4.568,3.962 -0.989,1.964 -1.483,4.432 -1.483,7.402 0,3.076 0.494,5.612 1.483,7.607 0.989,1.995 2.498,3.331 4.528,4.008 l -0.316,1.015 c -2.575,-0.677 -4.548,-2.133 -5.919,-4.37 -1.371,-2.237 -2.057,-4.946 -2.057,-8.128 0,-3.173 0.688,-5.882 2.063,-8.128 1.376,-2.245 3.347,-3.706 5.913,-4.383 z"
+           fill-rule="evenodd"
+           id="path31" />
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(278.054,617)"
+           id="text32">0</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(311.36,617)"
+           id="text33">=</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(338.767,617)"
+           id="text34">0</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(226.373,324)"
+           id="text35">ℎ</text>
+        <path
+           d="m 275.51,303.511 c 2.567,0.677 4.538,2.138 5.913,4.383 1.375,2.246 2.063,4.955 2.063,8.128 0,3.182 -0.685,5.891 -2.056,8.128 -1.371,2.237 -3.345,3.693 -5.92,4.37 l -0.316,-1.015 c 2.03,-0.677 3.54,-2.013 4.528,-4.008 0.989,-1.995 1.483,-4.531 1.483,-7.607 0,-2.97 -0.492,-5.438 -1.476,-7.402 -0.984,-1.965 -2.509,-3.285 -4.575,-3.962 z m -23.501,0 0.356,1.015 c -2.057,0.677 -3.579,1.997 -4.568,3.962 -0.989,1.964 -1.483,4.432 -1.483,7.402 0,3.076 0.494,5.612 1.483,7.607 0.989,1.995 2.498,3.331 4.528,4.008 l -0.316,1.015 c -2.575,-0.677 -4.548,-2.133 -5.919,-4.37 -1.372,-2.237 -2.057,-4.946 -2.057,-8.128 0,-3.173 0.688,-5.882 2.063,-8.128 1.376,-2.245 3.347,-3.706 5.913,-4.383 z"
+           fill-rule="evenodd"
+           id="path35" />
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(252.727,324)"
+           id="text36">𝑡</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="20px"
+           transform="translate(262.213,329)"
+           id="text37">1</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(293.127,324)"
+           id="text38">=</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(320.533,324)"
+           id="text39">ℎ</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="20px"
+           transform="translate(334.747,329)"
+           id="text40">1</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(226.113,355)"
+           id="text41">𝑉</text>
+        <path
+           d="m 277.477,334.511 c 2.566,0.677 4.537,2.138 5.913,4.383 1.375,2.246 2.063,4.955 2.063,8.128 0,3.182 -0.686,5.891 -2.057,8.128 -1.371,2.237 -3.344,3.693 -5.919,4.37 l -0.317,-1.015 c 2.031,-0.677 3.54,-2.013 4.529,-4.008 0.989,-1.995 1.483,-4.531 1.483,-7.607 0,-2.97 -0.492,-5.438 -1.476,-7.402 -0.985,-1.965 -2.51,-3.285 -4.575,-3.962 z m -23.501,0 0.356,1.015 c -2.057,0.677 -3.58,1.997 -4.568,3.962 -0.989,1.964 -1.484,4.432 -1.484,7.402 0,3.076 0.495,5.612 1.484,7.607 0.988,1.995 2.498,3.331 4.528,4.008 l -0.316,1.015 c -2.576,-0.677 -4.549,-2.133 -5.92,-4.37 -1.371,-2.237 -2.056,-4.946 -2.056,-8.128 0,-3.173 0.687,-5.882 2.063,-8.128 1.375,-2.245 3.346,-3.706 5.913,-4.383 z"
+           fill-rule="evenodd"
+           id="path41" />
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(254.693,355)"
+           id="text42">𝑡</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="20px"
+           transform="translate(264.18,360)"
+           id="text43">1</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(295.093,355)"
+           id="text44">=</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(322.5,355)"
+           id="text45">𝑉</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="20px"
+           transform="translate(335.007,360)"
+           id="text46">1</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(211.542,139)"
+           id="text47">ℎ</text>
+        <path
+           d="m 261.782,114.934 c 2.742,0.721 4.856,2.588 6.342,5.603 1.485,3.015 2.228,6.583 2.228,10.705 0,4.122 -0.743,7.691 -2.228,10.705 -1.486,3.015 -3.6,4.883 -6.342,5.603 l -0.329,-1.081 c 2.127,-0.8 3.737,-2.542 4.831,-5.227 1.095,-2.685 1.642,-6.014 1.642,-9.987 0,-3.981 -0.547,-7.317 -1.642,-10.006 -1.094,-2.689 -2.704,-4.434 -4.831,-5.234 z m -24.011,0 0.33,1.081 c -2.127,0.8 -3.738,2.545 -4.832,5.234 -1.094,2.689 -1.641,6.025 -1.641,10.006 0,3.973 0.547,7.302 1.641,9.987 1.094,2.685 2.705,4.427 4.832,5.227 l -0.33,1.081 c -2.742,-0.72 -4.856,-2.588 -6.341,-5.603 -1.485,-3.014 -2.228,-6.583 -2.228,-10.705 0,-4.122 0.743,-7.69 2.228,-10.705 1.485,-3.015 3.599,-4.882 6.341,-5.603 z"
+           fill-rule="evenodd"
+           id="path47" />
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(238.809,139)"
+           id="text48">𝑡</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="20px"
+           transform="translate(247.302,144)"
+           id="text49">𝑓</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(279.982,139)"
+           id="text50">=</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(307.389,139)"
+           id="text51">Δ</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(323.222,139)"
+           id="text52">ℎ</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="20px"
+           transform="translate(336.442,144)"
+           id="text53">𝑓</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(224.182,175)"
+           id="text54">𝑉</text>
+        <path
+           d="m 276.649,150.934 c 2.742,0.721 4.856,2.588 6.341,5.603 1.486,3.015 2.228,6.583 2.228,10.705 0,4.122 -0.742,7.691 -2.228,10.705 -1.485,3.015 -3.599,4.883 -6.341,5.603 l -0.33,-1.081 c 2.127,-0.8 3.738,-2.542 4.832,-5.227 1.094,-2.685 1.641,-6.014 1.641,-9.987 0,-3.981 -0.547,-7.317 -1.641,-10.006 -1.094,-2.689 -2.705,-4.434 -4.832,-5.234 z m -24.011,0 0.33,1.081 c -2.127,0.8 -3.738,2.545 -4.832,5.234 -1.094,2.689 -1.641,6.025 -1.641,10.006 0,3.973 0.547,7.302 1.641,9.987 1.094,2.685 2.705,4.427 4.832,5.227 l -0.33,1.081 c -2.742,-0.72 -4.856,-2.588 -6.341,-5.603 -1.486,-3.014 -2.228,-6.583 -2.228,-10.705 0,-4.122 0.742,-7.69 2.228,-10.705 1.485,-3.015 3.599,-4.882 6.341,-5.603 z"
+           fill-rule="evenodd"
+           id="path54" />
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(253.676,175)"
+           id="text55">𝑡</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="20px"
+           transform="translate(262.169,180)"
+           id="text56">𝑓</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(294.849,175)"
+           id="text57">=</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(322.256,175)"
+           id="text58">0</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(710.134,173)"
+           id="text59">𝑛</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(733.327,173)"
+           id="text60">=</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(760.734,173)"
+           id="text61">𝑛</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="20px"
+           transform="translate(776.067,178)"
+           id="text62">2</text>
+        <path
+           d="M 1,-1.70045e-7 1.0001,610.738 H -0.999896 L -1,1.70045e-7 Z M 4.0001,609.405 l -3.999995013,8 -4.000004987,-8 z"
+           transform="matrix(1,0,0,-1,182,653.405)"
+           id="path62" />
+        <path
+           d="M 5.48162e-7,-1 184.859,-0.999899 V 1.0001 L -5.48162e-7,1 Z M 183.525,-3.9999 l 8,4.000004987 -8,3.999995013 z"
+           transform="matrix(-1,0,0,1,226.525,653)"
+           id="path63" />
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(35.2614,640)"
+           id="text63">𝑛</text>
+        <path
+           d="M 0,0 1.04987e-4,320.96"
+           stroke="#000000"
+           stroke-width="3"
+           stroke-miterlimit="8"
+           fill="none"
+           fill-rule="evenodd"
+           transform="matrix(1,0,0,-1,66.5001,651.46)"
+           id="path64" />
+        <path
+           d="M 0,0 1.04987e-4,630.579"
+           stroke="#0070c0"
+           stroke-width="1.33333"
+           stroke-miterlimit="8"
+           stroke-dasharray="5.33333, 4"
+           fill="none"
+           fill-rule="evenodd"
+           transform="matrix(1,0,0,-1,103.5,651.079)"
+           id="path65" />
+        <path
+           d="M 0,0 1.04987e-4,314.689"
+           stroke="#000000"
+           stroke-width="3"
+           stroke-miterlimit="8"
+           fill="none"
+           fill-rule="evenodd"
+           transform="matrix(1,0,0,-1,139.5,334.189)"
+           id="path66" />
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(208.996,37)"
+           id="text66">ℎ</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(15.1252,316)"
+           id="text67">𝑛</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="20px"
+           transform="translate(30.4585,322)"
+           id="text68">𝑚𝑎𝑥</text>
+        <path
+           d="m 176.5,335 c 0,-4.142 4.029,-7.5 9,-7.5 4.971,0 9,3.358 9,7.5 0,4.142 -4.029,7.5 -9,7.5 -4.971,0 -9,-3.358 -9,-7.5 z"
+           stroke="#c00000"
+           stroke-width="3"
+           stroke-miterlimit="8"
+           fill="none"
+           fill-rule="evenodd"
+           id="path68" />
+        <path
+           d="M 0,0 144.005,1.04987e-4"
+           stroke="#000000"
+           stroke-width="1.33333"
+           stroke-linecap="square"
+           stroke-miterlimit="8"
+           stroke-dasharray="4, 1.33333"
+           fill="none"
+           fill-rule="evenodd"
+           transform="matrix(-1,0,0,1,210.506,330.5)"
+           id="path69" />
+        <path
+           d="m 193.095,339.199 39.745,78.573 -1.19,0.602 -39.745,-78.573 z m 42.117,75.879 0.042,8.944 -7.18,-5.333 z"
+           id="path70" />
+        <text
+           font-family="Cambria, Cambria_MSFontService, sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(204.067,453)"
+           id="text70">Break point</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(70.8542,677)"
+           id="text71">𝑛</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="20px"
+           transform="translate(86.1876,682)"
+           id="text72">ℎ𝑜𝑣𝑒𝑟</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(148.437,201)"
+           id="text73">𝑛</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="20px"
+           transform="translate(163.77,207)"
+           id="text74">2</text>
+        <path
+           d="M 0,0 1.04987e-4,320.468"
+           stroke="#000000"
+           stroke-width="1.33333"
+           stroke-miterlimit="8"
+           stroke-dasharray="5.33333, 4"
+           fill="none"
+           fill-rule="evenodd"
+           transform="matrix(1,0,0,-1,139.5,654.968)"
+           id="path74" />
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(710.134,347)"
+           id="text75">𝑛</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(733.327,347)"
+           id="text76">=</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="27px"
+           transform="translate(760.734,347)"
+           id="text77">𝑛</text>
+        <text
+           font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+           font-weight="400"
+           font-size="20px"
+           transform="translate(776.067,352)"
+           id="text78">2</text>
+      </g>
+    </g>
+  </g>
+</svg>

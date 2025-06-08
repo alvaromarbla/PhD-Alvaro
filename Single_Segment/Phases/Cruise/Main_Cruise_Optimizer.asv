@@ -1,0 +1,33 @@
+function [sol, fval] = Main_Cruise_Optimizer
+
+    % Initialize configuration
+    [params, bounds] = Cruise_Config;
+
+    % Optimization variables: [V, gamma, alpha, epsilon, n]
+    %vars0 = [25, deg2rad(36), deg2rad(-5), deg2rad(0), 55]; % Initial guess
+    vars0 = [25, deg2rad(5), deg2rad(30), 55]; % Initial guess
+
+    % Create bound vectors using configured constraints
+    lb = [bounds.V.min, bounds.alpha.min, ...
+          bounds.epsilon.min, bounds.n.min];
+    ub = [bounds.V.max, bounds.alpha.max, ...
+          bounds.epsilon.max, bounds.n.max];
+
+    % Configure solver
+    options = optimoptions('fmincon', ...
+        'Algorithm', 'sqp', ...
+        'Display', 'iter', ...
+        'MaxFunctionEvaluations', 1e4,'ConstraintTolerance',1e-9);
+
+
+    % Solve
+    [sol, fval] = fmincon(...
+        @(x) Cruise_Objective(x, params), ...
+        vars0, [], [], [], [], lb, ub, ...
+        @(x) Cruise_Constraints(x, params,bounds), ...
+        options);
+
+    % Post-process
+    %Cruise_2D_plot(sol,params);
+    Jsol
+end

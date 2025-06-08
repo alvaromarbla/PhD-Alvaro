@@ -1,0 +1,21 @@
+function [c, ceq] = Cruise_Constraints(x, params,bounds)
+    % Unpack variables
+    V = x(1); alpha = x(2); epsilon = x(3); n = x(4);
+    
+    % Reuse models from descent
+    [T, phi] = CT_Model(V, n, alpha, epsilon, params);
+    CP = CP_Model(V, n, alpha, epsilon, params);
+    L = CL_Model(alpha) * 0.5*params.rho*V^2*params.wing_area;
+    D = CD_Model(alpha) * 0.5*params.rho*V^2*params.wing_area;
+    P = params.prop.num_engines * CP * params.rho * n^3 * params.prop.diameter^5;
+    t_climb = params.deltaH / (V*sin(gamma));
+    % Dynamics constraints (steady climb)
+
+    T(X(1),X(2),X(3),X(6)).*cos(phi(X(3),X(6)))- L; 
+    T(X(1),X(2),X(3),X(6)).*sin(phi(X(3),X(6)))+0.5*rho*X(1).^2*S_ref*X(5)-W
+    ceq = [T*cos(phi) - D - params.mass*params.g*sin(gamma);   % Axial force balance
+        L + T*sin(phi) - params.mass*params.g*cos(gamma)];  % Normal force balance
+
+    % Bounds as inequality constraints
+    c = [x(1)/(x(5)*params.prop.diameter) - 1 ; -T; -P ; T - params.prop.T_max_eng*params.prop.num_engines ;  P - params.prop.P_max_eng*params.prop.num_engines; t_climb-600; -gamma];      
+end

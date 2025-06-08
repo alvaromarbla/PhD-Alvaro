@@ -78,7 +78,7 @@ tau    = 0.2;
 %% Flight conditions
 
 delta0    = 50; % Initial altitude
-t_estimate = 15; % Estimate of time, for calculating the phi_slope
+t_estimate = 5; % Estimate of time, for calculating the phi_slope
 eps_slope = pi/(2*t_estimate);
 
 
@@ -86,7 +86,7 @@ eps_slope = pi/(2*t_estimate);
 eps_0     = pi/2; 
 
 
-alpha_val = 0.261799387799149 ; % Estimate of alpha for V = 23 m/s;0.133831601086466
+alpha_val = 0;%0.261799387799149 ; % Estimate of alpha for V = 23 m/s;0.133831601086466
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -164,9 +164,9 @@ E_vec_remaining = (E_batt - E_vec)/E_batt*100;
         eta_m = 0.88*0.98*0.95; % Engine and electrical efficiency
 
         %% Loads and weight
-        mTOW  = 16.6; % Maximum T-O Mass [kg]
+        %mTOW  = 16.6; % Maximum T-O Mass [kg]
         g     = 9.81; % Gravity [m/s^2]
-        W     = mTOW*g;
+        %W     = mTOW*g;
 
         S_ref = 0.5008; % Reference surface [m^2]
 
@@ -493,9 +493,9 @@ save Mission_4.mat Mission_4
         eta_m = 0.88*0.98*0.95; % Engine and electrical efficiency
 
         %% Loads and weight
-        mTOW  = 16.6; % Maximum T-O Mass [kg]
+        %mTOW  = 16.6; % Maximum T-O Mass [kg]
         g     = 9.81; % Gravity [m/s^2]
-        W     = mTOW*g;
+        %W     = mTOW*g;
 
         S_ref = 0.5008; % Reference surface [m^2]
 
@@ -607,9 +607,9 @@ save Mission_4.mat Mission_4
         eta_m = 0.88*0.98*0.95; % Engine and electrical efficiency
 
         %% Loads and weight
-        mTOW  = 16.6; % Maximum T-O Mass [kg]
+        %mTOW  = 16.6; % Maximum T-O Mass [kg]
         g     = 9.81; % Gravity [m/s^2]
-        W     = mTOW*g;
+        %W     = mTOW*g;
 
         S_ref = 0.5008; % Reference surface [m^2]
 
