@@ -1,0 +1,708 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   sodipodi:docname="diagram_pipeline.svg"
+   inkscape:export-filename="diagram_pipeline.pdf"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.8718206"
+     inkscape:cx="153.70135"
+     inkscape:cy="345.25452"
+     inkscape:window-width="1920"
+     inkscape:window-height="1010"
+     inkscape:window-x="-6"
+     inkscape:window-y="-6"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g38" />
+  <defs
+     id="defs1">
+    <rect
+       x="604.1954"
+       y="176.06833"
+       width="167.17889"
+       height="57.638004"
+       id="rect39" />
+    <rect
+       x="664.67116"
+       y="300.09558"
+       width="43.797733"
+       height="44.608803"
+       id="rect30" />
+    <clipPath
+       id="clip1">
+      <rect
+         x="0"
+         y="0"
+         width="8991600"
+         height="3570349"
+         id="rect1-8" />
+    </clipPath>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       transform="matrix(0.1613365,0,0,0.15059412,0.92976752,25.024215)"
+       id="g38">
+      <text
+         font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="32px"
+         transform="translate(1097.12,355)"
+         id="text23" />
+      <text
+         font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="32px"
+         transform="translate(1116.82,355)"
+         id="text24" />
+      <text
+         font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="32px"
+         transform="translate(1128.65,355)"
+         id="text25" />
+      <text
+         font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="32px"
+         transform="translate(1096.9,394)"
+         id="text26" />
+      <text
+         font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="32px"
+         transform="translate(1114.55,394)"
+         id="text27" />
+      <text
+         font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="32px"
+         transform="translate(1126.38,394)"
+         id="text28" />
+      <text
+         font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="32px"
+         transform="translate(1112.56,432)"
+         id="text29" />
+      <path
+         d="m 319.11127,453.05673 h 161.9437 V 298.00107 l -0.31877,0.34147 h 155.26375 v -0.68395 H 480.41838 v 155.05633 l 0.31782,-0.34181 H 319.11127 Z m 315.61548,-150.95396 7.63534,-4.1017 -7.63534,-4.10168 z"
+         id="path30"
+         style="stroke-width:0.989284" />
+      <path
+         d="m 319.11127,313.18282 h 161.9437 V 298.0016 l -0.31877,0.34177 h 155.26278 v -0.68354 h -155.5806 v 15.18118 l 0.31782,-0.3418 H 319.11127 Z m 315.61548,-11.07952 7.63534,-4.1017 -7.63534,-4.1017 z"
+         id="path31"
+         style="stroke-width:0.989284" />
+      <rect
+         x="689.42535"
+         y="487.70444"
+         width="128.84641"
+         height="58.449135"
+         stroke="#000000"
+         stroke-width="2.96785"
+         stroke-miterlimit="8"
+         fill="#a9d18e"
+         fill-opacity="0.478431"
+         id="rect33" />
+      <text
+         font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="31.6572px"
+         transform="scale(0.96475639,1.0365311)"
+         id="text33"
+         x="738.74841"
+         y="508.60336"
+         style="stroke-width:0.989284">SET 2</text>
+      <rect
+         x="689.42535"
+         y="553.33148"
+         width="128.84641"
+         height="59.474556"
+         stroke="#000000"
+         stroke-width="2.96785"
+         stroke-miterlimit="8"
+         fill="#8497b0"
+         fill-opacity="0.478431"
+         id="rect34" />
+      <text
+         font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="31.6572px"
+         transform="scale(0.96475639,1.0365311)"
+         id="text34"
+         x="738.74841"
+         y="571.91748"
+         style="stroke-width:0.989284">SET 3</text>
+      <rect
+         x="689.42535"
+         y="419.00107"
+         width="128.84641"
+         height="60.499981"
+         stroke="#000000"
+         stroke-width="2.96785"
+         stroke-miterlimit="8"
+         fill="#f4b183"
+         fill-opacity="0.478431"
+         id="rect35" />
+      <text
+         font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+         font-style="italic"
+         font-weight="400"
+         font-size="31.6572px"
+         transform="scale(0.96475639,1.0365311)"
+         id="text35"
+         x="738.33679"
+         y="442.32132"
+         style="stroke-width:0.989284">SET 1</text>
+      <rect
+         x="103.41293"
+         y="541.02637"
+         width="198.51892"
+         height="100.49149"
+         stroke="#000000"
+         stroke-width="2.96785"
+         stroke-miterlimit="8"
+         fill="#d6dce5"
+         fill-opacity="0.478431"
+         id="rect36" />
+      <text
+         font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+         font-style="italic"
+         font-weight="400"
+         font-size="31.6572px"
+         transform="scale(0.96475639,1.0365311)"
+         id="text36"
+         x="176.08533"
+         y="561.0354"
+         style="stroke-width:0.989284">Other</text>
+      <text
+         font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+         font-style="italic"
+         font-weight="400"
+         font-size="31.6572px"
+         transform="scale(0.96475639,1.0365311)"
+         id="text37"
+         x="138.65739"
+         y="599.61749"
+         style="stroke-width:0.989284">Parameteres</text>
+      <path
+         d="M 308.61266,594.68513 H 481.4606 V 298.00107 l -0.31878,0.34147 h 154.71113 v -0.68395 H 480.82401 v 296.68473 l 0.31781,-0.34181 H 308.61266 Z m 325.96807,-292.58236 7.63533,-4.1017 -7.63533,-4.10168 z"
+         id="path37"
+         style="stroke-width:0.989284" />
+      <path
+         d="m 753.6895,419.07366 0.41421,-52.70852 -0.63624,-0.005 -0.41422,52.70859 z m 3.90288,-51.30953 -3.75305,-8.23774 -3.88201,8.16842 z"
+         id="path38"
+         style="stroke-width:0.989284" />
+      <path
+         d="m 764.64317,161.27894 -0.0679,65.95444 0.63617,-2e-4 0.0679,-65.95454 z m -3.56614,64.2411 3.8069,10.26733 3.82827,-10.26178 z"
+         id="path38-8"
+         style="stroke-width:1.10661" />
+      <text
+         font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+         font-style="italic"
+         font-weight="400"
+         font-size="32px"
+         id="text36-7"
+         x="1086.4318"
+         y="531.3703" />
+      <text
+         xml:space="preserve"
+         transform="matrix(1.6399471,0,0,1.75693,-5.7629087,-166.16993)"
+         id="text30"
+         style="white-space:pre;shape-inside:url(#rect30);display:inline;fill:none;stroke:#2242ea;stroke-width:2.2715;stroke-dasharray:7.40787, 3.70394, 1.85197, 3.70394" />
+      <text
+         xml:space="preserve"
+         style="font-size:20.3692px;fill:none;stroke:#2242ea;stroke-width:3.85571;stroke-dasharray:12.5743, 6.28718, 3.14359, 6.28718"
+         x="1071.3293"
+         y="260.04968"
+         id="text31"
+         transform="scale(0.96613472,1.0350523)"><tspan
+           sodipodi:role="line"
+           id="tspan4"
+           style="stroke-width:3.85571" /></text>
+      <text
+         xml:space="preserve"
+         style="font-size:20.3692px;fill:none;stroke:#2242ea;stroke-width:3.85571;stroke-dasharray:12.5743, 6.28718, 3.14359, 6.28718"
+         x="993.88806"
+         y="234.9243"
+         id="text32"
+         transform="scale(0.96613472,1.0350523)"><tspan
+           sodipodi:role="line"
+           id="tspan31"
+           style="stroke-width:3.85571" /></text>
+      <text
+         xml:space="preserve"
+         style="font-size:20.3692px;fill:none;stroke:#2242ea;stroke-width:3.85571;stroke-dasharray:12.5743, 6.28718, 3.14359, 6.28718"
+         x="949.14423"
+         y="199.12921"
+         id="text38"
+         transform="scale(0.96613472,1.0350523)"><tspan
+           sodipodi:role="line"
+           id="tspan32"
+           style="stroke-width:3.85571" /></text>
+      <text
+         xml:space="preserve"
+         transform="matrix(1.6399471,0,0,1.75693,-5.7629087,-166.16993)"
+         id="text39"
+         style="white-space:pre;shape-inside:url(#rect39);display:inline;fill:none;stroke:#2242ea;stroke-width:2.2715;stroke-dasharray:7.40787, 3.70394, 1.85197, 3.70394" />
+      <g
+         transform="matrix(0.89471142,0,0,1.0470758,313.81882,-491.9867)"
+         id="g2-7">
+        <rect
+           x="429.5"
+           y="563.5"
+           width="147"
+           height="60"
+           stroke="#000000"
+           stroke-width="3"
+           stroke-miterlimit="8"
+           fill="#d6dce5"
+           fill-opacity="0.478431"
+           id="rect1-0" />
+        <text
+           font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+           font-style="italic"
+           font-weight="400"
+           font-size="24px"
+           transform="translate(446.114,586)"
+           id="text1-0">Performance</text>
+        <text
+           font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+           font-style="italic"
+           font-weight="400"
+           font-size="24px"
+           transform="translate(468.761,615)"
+           id="text2-1">Metrics</text>
+      </g>
+      <g
+         transform="matrix(1.9442306,0,0,2.3060376,-623.10334,-272.9791)"
+         id="g1">
+        <rect
+           x="799.78516"
+           y="130.39896"
+           width="171.70627"
+           height="246.61989"
+           stroke="#000000"
+           stroke-width="1.41733"
+           stroke-miterlimit="8"
+           fill="#febef5"
+           fill-opacity="0.47451"
+           id="rect1-85" />
+        <text
+           font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+           font-style="italic"
+           font-weight="400"
+           font-size="16.3663px"
+           id="text1-3"
+           x="824.71716"
+           y="155.04706"
+           transform="scale(0.98654044,1.0136432)"
+           style="stroke-width:0.681928">Trajectory Optimization</text>
+      </g>
+      <rect
+         x="1001.0874"
+         y="183.15134"
+         width="223.76463"
+         height="189.63043"
+         stroke="#000000"
+         stroke-width="2.50541"
+         stroke-miterlimit="8"
+         fill="#d6dce5"
+         fill-opacity="0.478431"
+         id="rect8" />
+      <text
+         font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+         font-style="italic"
+         font-weight="400"
+         font-size="31.6572px"
+         transform="scale(0.96475641,1.0365311)"
+         id="text9"
+         x="1089.1263"
+         y="212.43587"
+         style="stroke-width:0.989284">States and</text>
+      <text
+         font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+         font-style="italic"
+         font-weight="400"
+         font-size="31.6572px"
+         transform="scale(0.96475641,1.0365311)"
+         id="text10"
+         x="1102.5905"
+         y="251.01791"
+         style="stroke-width:0.989284">controls</text>
+      <text
+         font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+         font-style="italic"
+         font-weight="400"
+         font-size="31.6572px"
+         transform="scale(0.96475641,1.0365311)"
+         id="text11"
+         x="1193.1892"
+         y="251.01791"
+         style="stroke-width:0.989284">:</text>
+      <text
+         font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="31.6572px"
+         transform="scale(0.96475641,1.0365311)"
+         id="text12"
+         x="1127.7085"
+         y="288.61072"
+         style="stroke-width:0.989284">𝑥</text>
+      <text
+         font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+         font-style="italic"
+         font-weight="400"
+         font-size="31.6572px"
+         transform="scale(0.96475641,1.0365311)"
+         id="text13"
+         x="1145.4761"
+         y="288.61072"
+         style="stroke-width:0.989284">,</text>
+      <text
+         font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+         font-style="italic"
+         font-weight="400"
+         font-size="31.6572px"
+         transform="scale(0.96475641,1.0365311)"
+         id="text14"
+         x="1159.1676"
+         y="288.61072"
+         style="stroke-width:0.989284">h, E</text>
+      <text
+         font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="31.6572px"
+         id="text15"
+         x="1097.0001"
+         y="326.19601"
+         transform="scale(0.96475641,1.0365311)"
+         style="stroke-width:0.989284">𝛾</text>
+      <text
+         font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="31.6572px"
+         id="text15-3"
+         x="1066.3152"
+         y="328.29874"
+         transform="scale(0.96475641,1.0365311)"
+         style="stroke-width:0.989284">V,</text>
+      <text
+         font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="31.6572px"
+         id="text16"
+         x="1114.5006"
+         y="326.19601"
+         transform="scale(0.96475641,1.0365311)"
+         style="stroke-width:0.989284">,</text>
+      <text
+         font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="31.6572px"
+         id="text17"
+         x="1126.2136"
+         y="326.19601"
+         transform="scale(0.96475641,1.0365311)"
+         style="stroke-width:0.989284">𝛼</text>
+      <text
+         font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="31.6572px"
+         id="text18"
+         x="1146.1278"
+         y="326.19601"
+         transform="scale(0.96475641,1.0365311)"
+         style="stroke-width:0.989284">,</text>
+      <text
+         font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="31.6572px"
+         id="text19"
+         x="1157.8313"
+         y="326.19601"
+         transform="scale(0.96475641,1.0365311)"
+         style="stroke-width:0.989284">𝜀</text>
+      <text
+         font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="31.6572px"
+         id="text20"
+         x="1173.1848"
+         y="326.19601"
+         transform="scale(0.96475641,1.0365311)"
+         style="stroke-width:0.989284">,</text>
+      <text
+         font-family="'Cambria Math', 'Cambria Math_MSFontService', sans-serif"
+         font-weight="400"
+         font-size="31.6572px"
+         id="text21"
+         x="1184.8881"
+         y="326.19601"
+         transform="scale(0.96475641,1.0365311)"
+         style="stroke-width:0.989284">𝜙</text>
+      <text
+         font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+         font-style="italic"
+         font-weight="400"
+         font-size="31.6572px"
+         id="text22"
+         x="1207.1667"
+         y="326.19601"
+         transform="scale(0.96475641,1.0365311)"
+         style="stroke-width:0.989284">, n</text>
+      <path
+         d="m 1110.0894,372.62239 -0.03,47.32599 -0.012,13.1455 0.6363,1.5e-4 0.038,-60.47157 z m -3.5365,58.90442 3.8117,9.40957 3.8236,-9.41286 z"
+         id="path38-4"
+         sodipodi:nodetypes="cccccccccc"
+         style="stroke-width:1.05961" />
+      <rect
+         x="1010.5859"
+         y="441.85071"
+         width="205.94377"
+         height="110.51392"
+         stroke="#000000"
+         stroke-width="3.16999"
+         stroke-miterlimit="8"
+         fill="#d6dce5"
+         fill-opacity="0.478431"
+         id="rect36-9" />
+      <text
+         font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+         font-style="italic"
+         font-weight="400"
+         font-size="26.5658px"
+         id="text37-4"
+         x="1041.7913"
+         y="459.63123"
+         transform="scale(0.98203752,1.018291)"
+         style="stroke-width:0.830181"><tspan
+           sodipodi:role="line"
+           id="tspan1"
+           x="1041.7913"
+           y="459.63123"
+           style="stroke-width:0.830181">Derived</tspan><tspan
+           sodipodi:role="line"
+           id="tspan2"
+           x="1041.7913"
+           y="492.83853"
+           style="stroke-width:0.830181">Parameters:</tspan><tspan
+           sodipodi:role="line"
+           x="1041.7913"
+           y="526.04584"
+           style="stroke-width:0.830181"
+           id="tspan3">T, P, L, D</tspan></text>
+      <path
+         d="m 866.24225,318.08843 h 129.27994 v 0.68292 H 866.24225 Z m 128.10642,-3.76023 7.02653,4.10169 -7.02653,4.10169 z"
+         id="path33"
+         style="stroke-width:0.949316" />
+      <g
+         transform="matrix(1.0736807,0,0,1.3874283,-8.541765,-98.606497)"
+         id="g1-1">
+        <rect
+           x="80.676888"
+           y="207.15877"
+           width="236.62149"
+           height="245.67523"
+           stroke="#000000"
+           stroke-width="2.85801"
+           stroke-miterlimit="8"
+           fill="#00b0f0"
+           fill-opacity="0.478431"
+           id="rect1-6" />
+        <rect
+           x="98.535774"
+           y="252.19089"
+           width="208.00763"
+           height="87.950768"
+           stroke="#000000"
+           stroke-width="2.43164"
+           stroke-miterlimit="8"
+           fill="#dae3f3"
+           fill-opacity="0.478431"
+           id="rect2" />
+        <text
+           font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+           font-style="italic"
+           font-weight="400"
+           font-size="25.9376px"
+           transform="scale(1.0966937,0.91183161)"
+           id="text2"
+           x="121.4882"
+           y="316.69818"
+           style="stroke-width:0.810547">Aerodynamic</text>
+        <text
+           font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+           font-style="italic"
+           font-weight="400"
+           font-size="25.9376px"
+           transform="scale(1.0966937,0.91183161)"
+           id="text3"
+           x="153.60231"
+           y="348.30954"
+           style="stroke-width:0.810547">Model</text>
+        <rect
+           x="98.535774"
+           y="352.70605"
+           width="208.00763"
+           height="88.689842"
+           stroke="#000000"
+           stroke-width="2.43164"
+           stroke-miterlimit="8"
+           fill="#dae3f3"
+           fill-opacity="0.478431"
+           id="rect3" />
+        <text
+           font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+           font-style="italic"
+           font-weight="400"
+           font-size="25.9376px"
+           transform="scale(1.0966937,0.91183161)"
+           id="text4"
+           x="98.963058"
+           y="443.14346"
+           style="stroke-width:0.810547">Propulsive</text>
+        <text
+           font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+           font-style="italic"
+           font-weight="400"
+           font-size="25.9376px"
+           transform="scale(1.0966937,0.91183161)"
+           id="text5"
+           x="208.24614"
+           y="443.14346"
+           style="stroke-width:0.810547">Model</text>
+        <text
+           font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+           font-style="italic"
+           font-weight="400"
+           font-size="21.6412px"
+           id="text1-33"
+           x="88.235741"
+           y="248.25607"
+           transform="matrix(1.0740022,0.00148806,-0.00183826,0.93109424,0,0)"
+           style="stroke-width:0.901716">Wind tunnel experiments</text>
+      </g>
+      <g
+         transform="matrix(0.94934777,0,0,0.99538559,30.135246,42.446844)"
+         id="g4">
+        <rect
+           x="76.325478"
+           y="8.5100956"
+           width="234.21284"
+           height="124.75874"
+           stroke="#000000"
+           stroke-width="3.5381"
+           stroke-miterlimit="8"
+           fill="#d6dce5"
+           fill-opacity="0.478431"
+           id="rect1" />
+        <text
+           font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+           font-style="italic"
+           font-weight="400"
+           font-size="30.7008px"
+           transform="scale(0.90996778,1.09894)"
+           id="text1"
+           x="115.00682"
+           y="72.203262"
+           style="stroke-width:1.2792">Flight Dynamics</text>
+        <path
+           d="m 578.5,79.1667 h 33.429 V 256.892 l -0.333,-0.333 h 26.429 v 0.667 H 611.263 V 79.5001 l 0.333,0.3333 H 578.5 Z m 58.192,173.7253 8,4 -8,4 z"
+           id="path3" />
+        <path
+           d="m 307.83437,77.521699 91.59831,1.38e-4 v 0.919786 l -91.59831,-1.38e-4 z m 89.54706,-5.058476 12.31057,5.518576 -12.31057,5.518301 z"
+           id="path4"
+           style="stroke-width:1.45704" />
+        <g
+           transform="matrix(1.007724,0,0,1.0000483,-3.1115469,-6.7427327)"
+           id="g2">
+          <rect
+             x="409.5"
+             y="34.500099"
+             width="169"
+             height="91"
+             stroke="#000000"
+             stroke-width="3"
+             stroke-miterlimit="8"
+             fill="#d6dce5"
+             fill-opacity="0.478431"
+             id="rect1-69" />
+          <text
+             font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+             font-style="italic"
+             font-weight="400"
+             font-size="24px"
+             transform="translate(423.925,73)"
+             id="text1-4">Flight Segment</text>
+          <text
+             font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+             font-style="italic"
+             font-weight="400"
+             font-size="24px"
+             transform="translate(446.732,102)"
+             id="text2-45">Definition</text>
+        </g>
+      </g>
+      <g
+         transform="matrix(1.0779618,0,0,1.2010869,-52.523783,-10.974499)"
+         id="g3">
+        <rect
+           x="644.5"
+           y="206.5"
+           width="208"
+           height="102"
+           stroke="#000000"
+           stroke-width="3"
+           stroke-miterlimit="8"
+           fill="#d6dce5"
+           fill-opacity="0.478431"
+           id="rect1-08" />
+        <text
+           font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+           font-style="italic"
+           font-weight="400"
+           font-size="24px"
+           transform="translate(670.598,250)"
+           id="text1-2">Solver</text>
+        <text
+           font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+           font-style="italic"
+           font-weight="400"
+           font-size="24px"
+           transform="translate(733.931,250)"
+           id="text2-19">choice and</text>
+        <text
+           font-family="'Bell MT', 'Bell MT_MSFontService', sans-serif"
+           font-style="italic"
+           font-weight="400"
+           font-size="24px"
+           transform="translate(685.024,279)"
+           id="text3-2">Configuration</text>
+      </g>
+    </g>
+  </g>
+</svg>

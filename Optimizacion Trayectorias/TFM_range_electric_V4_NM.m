@@ -40,27 +40,27 @@ CD0      = p_CD_ac(1)-CD1*CL0-CD2*CL0^2; % K2
 alphav = linspace(-pi/2,pi/2,180);
 
 
-CLv = CL(alphav);
-CDv = CD(alphav);
-% figure(1)
+% CLv = CL(alphav);
+% CDv = CD(alphav);
+% figure(100)
 % plot(alphav*180/pi,CLv)
-% figure(2)
+% figure(120)
 % plot(alphav*180/pi,CDv)
-
-figure(200)
-plot(alphav*180/pi,CLv./CDv,'LineWidth',1.5)
-grid on
-Title1 = strcat('Aerodynamic efficiency [-] vs Angle of attack [deg].');
-title(Title1)
-xlabel('\alpha [deg]')
-ylabel('C_L/C_D [-]')
+% 
+% figure(200)
+% plot(alphav*180/pi,CLv./CDv,'LineWidth',1.5)
+% grid on
+% Title1 = strcat('Aerodynamic efficiency [-] vs Angle of attack [deg].');
+% title(Title1)
+% xlabel('\alpha [deg]')
+% ylabel('C_L/C_D [-]')
 
 % figure(3)
 % plot(CLv,CDv)
 
-CL_max_w1_CR  = max(CLv); 
-Safety_F      = 1.2;
-CL_max_w1_CR_ope = CL_max_w1_CR/Safety_F^2; 
+% CL_max_w1_CR  = max(CLv); 
+% Safety_F      = 1.2;
+% CL_max_w1_CR_ope = CL_max_w1_CR/Safety_F^2; 
 
 
 %% Propulsive Model
@@ -207,7 +207,7 @@ nconlin_full = X_sol_full(:,2);
 
 %% Calculate stall speed
 
-Vstall = sqrt(2*W/(rho*S_ref*CL_max_w1_CR_ope));
+%Vstall = sqrt(2*W/(rho*S_ref*CL_max_w1_CR_ope));
 
 %% Eliminate zeros from indeterminations (points where CP = 0)
 xfmat  = xfmat'; % To make revolutions stand on the x-axis and V on the y-axis
@@ -384,7 +384,7 @@ vect_cc_xf = [5,10,15,20,25,30,40,50,60,70,80];
          %plot(nconlin,Vlin,'--r','LineWidth',2)
          plot(nconlin_full,Vlin,'-.m','LineWidth',2)
          %plot(nTmaxlin,Vlin,'-b','LineWidth',2.5)
-         yline(Vstall,'-.b','LineWidth',2)
+         %yline(Vstall,'-.b','LineWidth',2)
          xline(rps_max,':b','LineWidth',2)
          %plot(nsol_A,Vsol,'*g','LineWidth',2)
          plot(nsol_fmincon,Vsol_fmincon,'og','LineWidth',2.5)
@@ -424,6 +424,9 @@ phi = @(alpha, eps_eng) alpha + eps_eng;
     T = @(V,n,alpha,eps_eng) CT(V,n,alpha,eps_eng).*N_eng*rho*n.^2*D^4;
 
 Tsol =  T(Vsol_fmincon,nsol_fmincon,alphasol_fmincon,epsilonsol_fmincon);
+
+Tsol.*cos(phi(alphasol_fmincon,epsilonsol_fmincon))- 0.5*rho*Vsol_fmincon.^2*S_ref*CD(alphasol_fmincon)
+
 
 t_vec = linspace(0,t_end,Tlin);
 x_vec = linspace(0,xf_max_fmin*1000,Tlin);

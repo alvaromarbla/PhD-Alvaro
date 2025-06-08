@@ -59,7 +59,6 @@ hUpp = deltaH*1.05;  %Maybe some overoscillation
 vLow = 0; %Just look at the trajectory as it goes up
 vUpp = 15;  % Go as fast as you can
 
-
 nHover = 45.7558; % Result from Hovering
 uLow = nHover/2; %%40
 uUpp = rps_max; %Maximum rps output

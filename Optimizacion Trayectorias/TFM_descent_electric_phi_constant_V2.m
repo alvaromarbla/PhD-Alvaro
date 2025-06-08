@@ -153,7 +153,7 @@ tspan = linspace(0,200,Tlin);      % Interpolate time of integration
 Pmax_Eng = 6.7e3; % Max Power per engine [W]
 Pmax = N_eng*Pmax_Eng;
 
-
+flag_plot = 0
 if flag_plot == 1
 
     figure(1)
