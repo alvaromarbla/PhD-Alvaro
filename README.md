@@ -1,4 +1,4 @@
-# TFM-Alvaro
-TFM Alvaro Martinez EMERGENTIa
+# PhD-Alvaro
+PhD Alvaro Martinez-Blanco EMERGENTIa
 
-En este repositorio se almacenan los códigos del Proyecto EMERGENTIa del TFG y TFM de Álvaro Martínez, sobre propulsión y optimización de trayectorias en RPAS. 
+This repository contains all scripts and models for the PATRONUS tool (Performance Analysis and Trajectory Routing and Optimized Navigation for Unmanned Systems). All enmarked within the University of Sevilla, for the doctorate program of Alvaro Martinez-Blanco. 
