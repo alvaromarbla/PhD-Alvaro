@@ -1,0 +1,22 @@
+function [params, bounds] = cruise_config (params)
+
+
+%% This section only accounts for the PHASE SPECIFIC parameters.
+
+% Cruise Segment. 
+
+% This accounts for segment specific params and bounds
+
+mass_batt= 3;        % [kg]
+tau = 0.2;  % Security factor for battery discharge 
+e0  = 720e3;  % Battery Energy density  [J/kg]
+E_batt = e0*mass_batt*(1-tau); % [J]
+ 
+params.E_batt = E_batt; % Cruise Energy 
+
+
+
+
+
+
+end 
