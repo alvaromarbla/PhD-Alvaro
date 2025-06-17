@@ -1,10 +1,11 @@
-function [sol, fval] = main_cruise %Solve cruise?
-    
+function [sol, fval] = main_cruise 
     
     % Initialize configuration
     % Plane config 
 
     params = provant_emergentia_config;
+
+    % Phase specific config
     [params, bounds] = cruise_config(params);
 
     % Optimization variables: [V, gamma, alpha, epsilon, n]
@@ -27,11 +28,12 @@ function [sol, fval] = main_cruise %Solve cruise?
 
 
     % Solve %% Extract more information!!!
-    [sol, fval] = fmincon(...
-        @(x) Cruise_Objective(x, params), ...
+    [sol, fval,exitflag,output,lambda,grad,hessian] = fmincon(...
+        @(x) cruise_objective(x, params), ...
         initial_cond, [], [], [], [], lb, ub, ...
-        @(x) Cruise_Constraints(x, params,bounds), ...
+        @(x) cruise_constraints(x, params,bounds), ...
         options);
+
 
     % Post-process
 

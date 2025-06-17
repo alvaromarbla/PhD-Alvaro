@@ -3,11 +3,14 @@ function [c, ceq] = cruise_constraints(x, params,bounds)
     V = x(1); alpha = x(3); epsilon = x(4); n = x(5); %
     
     % Reuse models from descent
-    [T, phi] = CT_Model(V, n, alpha, epsilon, params);
-    CP = CP_Model(V, n, alpha, epsilon, params);
-    L = CL_Model(alpha) * 0.5*params.rho*V^2*params.wing_area;
-    D = CD_Model(alpha) * 0.5*params.rho*V^2*params.wing_area;
-    P = params.prop.num_engines * CP * params.rho * n^3 * params.prop.diameter^5;
+
+    L = CL_wholeAC_1wing(alpha) * 0.5*params.rho*V^2*params.wing_area;
+    D = CD_wholeAC_1wing(alpha) * 0.5*params.rho*V^2*params.wing_area;
+
+    phi = alpha + epsilon;
+    T = prop_CT_1365(V, n , phi, params);
+    P = prop_CP_1365(V, n , phi, params);
+    
     % Dynamics constraints (steady cruis)
 
     ceq = [T*cos(phi) - D ;   % Axial force balance
