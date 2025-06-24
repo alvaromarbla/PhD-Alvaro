@@ -14,9 +14,7 @@ function params = provant_emergentia_config
     params.prop.eff = 0.733;        % [-] Efficiency of engines
     params.rho = 1.2133;              % [kg/m³]
     params.g = 9.81;                  % [m/s²]
-    params.deltaH = 350;              % [m] Climb altitude
     params.mass_batt= mass_batt;             
     params.E_batt = E_batt; 
-    params.n_ope = params.prop.max_rps/2;
 end
   
