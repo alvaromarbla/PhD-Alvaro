@@ -18,7 +18,7 @@ function [Xsol,Xfval] = main_cruise
           bounds.epsilon.max, bounds.n.max]';
 
     % Initial guess
-    N_sample = 10; % In case we want to do a Latin Hypercube Sampling
+    N_sample = 50; % In case we want to do a Latin Hypercube Sampling
     initial_cond = cruise_initial_cond (lb, ub, N_sample);
 
     % Configure solver
