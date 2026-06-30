@@ -13,7 +13,7 @@ close all
   % fmincon method
 
 
-
+tic 
 
 %% Loads and weight
 mTOW = 16.6; % Maximum T-O Mass [kg]
@@ -29,10 +29,10 @@ tau = 0.0;
 eta_m = 0.88*0.98*0.95; % Engine and electrical efficiency
 mbatt = 3; %[kg]
 e0    = 720e3; %[J/kg]
-E     = e0*mbatt*0.6  %[J] Total energy of the battery packs
+E     = e0*mbatt*1  %[J] Total energy of the battery packs
 %E = 1.2111e+06 - e0*mbatt*0.2; % Total energy after mission to perform extended cruise
 N_eng = 2; % Number of engines
-D     = 0.8128*0.85; % Propeller Diameter [m]
+D     = 0.8128*1; % Propeller Diameter [m]
 
 RPMMAX_APC = 150000; % Max RPM of AXI motors 
 D_inches = D*1000/25.4; % Diameter in inches
@@ -1067,3 +1067,4 @@ alphaplot4 = [alphacons1; alphacons2];
 
 
 end
+t = toc
