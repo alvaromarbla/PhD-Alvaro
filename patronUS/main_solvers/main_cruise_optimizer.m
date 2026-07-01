@@ -106,3 +106,12 @@ stats = opti.stats();
 inf_pr = stats.iterations.inf_pr;   % primal infeasibility (constraint violation) per iter
 inf_du = stats.iterations.inf_du;   % dual infeasibility (KKT stationarity) per iter
 obj_hist = stats.iterations.obj;
+
+viol  = computeConstraintViolation(hist.g_hist, n_ineq, n_eq);
+slack = computeBoundSlack(hist.X_hist, bounds);
+
+history_matrix = hist.X_hist;
+plotIpoptconvergence(history_matrix, bounds);
+
+plotVariableEvolution(hist.X_hist, bounds);
+plotConvergenceMetrics(stats, viol, slack);
