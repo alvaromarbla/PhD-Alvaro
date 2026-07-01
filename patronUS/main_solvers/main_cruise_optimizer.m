@@ -21,7 +21,7 @@ versions.Batt_version = ' '; % Battery model to use
 
 % Versions for constraints
 % To choose among: 1Wing, 1Wing_Nacelle, 2Wings
-versions.constraints = "1Wing";
+versions.constraints = "1Wing_Nacelle";
 
 %% Import Casadi and optimizer
 
@@ -69,9 +69,16 @@ switch versions.constraints
     otherwise
         error("Unknown constraint set selected.")
 end
+
+g_all = [c; ceq];   % keep this handle
+n_ineq = numel(c);
+n_eq   = numel(ceq);
+
 opti.subject_to(c <= 0);
 opti.subject_to(ceq == 0);
 
+hist = IterHistory();
+opti.callback(@(i) hist.record(opti.debug.value(X), opti.debug.value(g_all)));
 %% Configure solver (IPOPT)
 
 opts.ipopt.max_iter = 1000;
@@ -93,20 +100,9 @@ catch e
     fval = opti.debug.value(obj_fun);
 end
 
-%%  Postprocess
-% 1. Extract the optimized numerical values
-V_opt       = sol_obj.value(X(1));
-alpha_opt   = sol_obj.value(X(3));
-epsilon_opt = sol_obj.value(X(4));
-n_opt       = sol_obj.value(X(5));
+[results, aux] = cruise_postp(sol_obj, X , models, params, fval);
 
-% 2. Calculate the optimized J and phi coordinates
-J_opt   = V_opt / (n_opt * params.prop.diameter);
-phi_opt = alpha_opt + epsilon_opt;
-
-% 3. Evaluate models numerically using full()
-CT_opt = full(models.CT_lookup(J_opt,phi_opt));
-CP_opt = full(models.CP_lookup(J_opt,phi_opt));
-CL_opt = full(models.CL_lookup(alpha_opt));
-CD_opt = full(models.CD_lookup(alpha_opt));
-
+stats = opti.stats();
+inf_pr = stats.iterations.inf_pr;   % primal infeasibility (constraint violation) per iter
+inf_du = stats.iterations.inf_du;   % dual infeasibility (KKT stationarity) per iter
+obj_hist = stats.iterations.obj;

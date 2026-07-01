@@ -15,8 +15,8 @@ if CD_version == "analytical"
 
     CD_interp = interpolant('CD_fuselage_interp', 'bspline', {alpha_mesh}, CD_fuselage_mesh);
 
-    alpha = SX.sym('alpha');
-    CD_fuselage_lookup = CD_interp(alpha);
+   
+    CD_fuselage_lookup = CD_interp;
 else
     warning('CD version unknown')
 end

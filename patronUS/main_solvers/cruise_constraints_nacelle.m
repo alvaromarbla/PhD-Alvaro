@@ -29,13 +29,19 @@ P =  params.prop.num_engines * CP * params.rho * (n^3) * (params.prop.diameter^5
 
 
 kappa = T/(0.5 * params.rho * params.prop.diameter^2*V^2);
-%lambda^4 + 2* sin(phi) *lambda^3 + labda^2 -kappa^2 = 0
 
-coeffs = [1, 2 * sin_phi, 1, 0, -kappa^2];
-all_roots = roots(coeffs);
+
+lambda_i = 0.1;
+
+for i= 1:5
+    f = lambda_i^4 + 2*sin(phi)*lambda_i^3 + lambda_i^2 - kappa^2;
+
+    df = 4*lambda_i^3 + 6*sin(phi)*lambda_i^2 + 2*lambda_i;
+
+    lambda_i = lambda_i -f/df;
+end
 
 % Filter for the real, positive physical root corresponding to induced velocity
-lambda_i = real(all_roots(imag(all_roots) == 0 & real(all_roots) > 0));
 alpha_nac = atan(sin(phi)/(lambda_i + cos(phi)));
 V_nac2 = V^2 + (lambda_i*V)^2 + 2*cos(phi)*lambda_i*V^2;
 q_nac = 0.5 * params.rho * (V_nac2) * params.nacelle_area;

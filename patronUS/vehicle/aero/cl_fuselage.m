@@ -23,9 +23,8 @@ CL_interp = interpolant('CL_interp','bspline',{alpha_mesh},CL_fuselage_2wing_mes
 
 % Symbolic translation using CASADI for OCP:
 
-alpha = SX.sym('alpha');
 
-CL_fuselage_lookup = CL_interp(alpha);
+CL_fuselage_lookup = CL_interp;
 
 else
     warning('CL version unknown')
