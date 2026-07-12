@@ -12,7 +12,7 @@
 
 %% User version input
 
-versions.AC_version   = "1WING"; % Aicraft Version
+versions.AC_version   = "2WING"; % Aicraft Version
 versions.CL_version   = 'analytical'; % CL model to use
 versions.CD_version   = 'analytical'; % CD model to use
 versions.CT_version   = 'analytical'; % CT model to use
@@ -21,7 +21,7 @@ versions.Batt_version = ' '; % Battery model to use
 
 % Versions for constraints
 % To choose among: 1Wing, 1Wing_Nacelle, 2Wings
-versions.constraints = "1Wing_Nacelle";
+versions.constraints = "2Wings";
 
 %% Import Casadi and optimizer
 
@@ -38,19 +38,22 @@ models = models_config(versions);
 
 %% Define Decision Variables
 
-X = opti.variable(5, 1); % [V; gamma; alpha; epsilon; n]
+X = opti.variable(8, 1); % [V; gamma; alpha; epsilon1 ; epsilon2; n1; n2;delta_e]
 
 % Apply bounds to states
 
 opti.subject_to(bounds.V.min        <= X(1) <= bounds.V.max);
 opti.subject_to(bounds.gamma.min    <= X(2) <= bounds.gamma.max);
 opti.subject_to(bounds.alpha.min    <= X(3) <= bounds.alpha.max);
-opti.subject_to(bounds.epsilon.min  <= X(4) <= bounds.epsilon.max);
-opti.subject_to(bounds.n.min        <= X(5) <= bounds.n.max);
+opti.subject_to(bounds.epsilon1.min  <= X(4) <= bounds.epsilon1.max);
+opti.subject_to(bounds.n1.min        <= X(5) <= bounds.n1.max);
+opti.subject_to(bounds.epsilon2.min  <= X(6) <= bounds.epsilon2.max);
+opti.subject_to(bounds.n2.min        <= X(7) <= bounds.n2.max);
+opti.subject_to(bounds.delta_e.min   <= X(8) <= bounds.delta_e.max);
 
 %% Apply initial interation for solver
 
-vars0 = [24.225109; deg2rad(0); 0.046444; deg2rad(60); 25.214554];
+vars0 = [24.225109; deg2rad(0); 0.046444; deg2rad(60); 25.214554; deg2rad(60); 25.214554 ; deg2rad(0)];
 %vars0 = [30; deg2rad(3); 0.1; deg2rad(4); 40];
 opti.set_initial(X, vars0)
 
@@ -65,7 +68,8 @@ switch versions.constraints
         [c, ceq] = cruise_constraints_2GDL(X, models, params,bounds);
     case "1Wing_Nacelle"
         [c, ceq] = cruise_constraints_nacelle(X, models, params,bounds);
-
+    case "2Wings"
+        [c, ceq] = cruise_constraints_3GDL(X, models, params,bounds);
     otherwise
         error("Unknown constraint set selected.")
 end
