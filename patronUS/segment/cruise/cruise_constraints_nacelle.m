@@ -1,11 +1,11 @@
-function [c, ceq] = cruise_constraints_nacelle(x, models, params, bounds)
+function [c, ceq] = cruise_constraints_nacelle(X_struct, models, params, bounds)
 
 % Unpack variables to match the 5-element vector: [V, gamma, alpha, epsilon, n]
-V       = x(1);
+V       = X_struct.V;
 % gamma = x(2); % Steady cruise implies gamma = 0, which is handled via bounds or optimization rules
-alpha   = x(3);
-epsilon = x(4);
-n       = x(5);
+alpha   = X_struct.alpha;
+epsilon = X_struct.epsilon;
+n       = X_struct.n;
 
 %% Call B-spline models on aero and propulsive forces:
 J = V./(n*params.prop.diameter);
@@ -16,7 +16,6 @@ CP = models.CP_lookup(J,phi);
 CL = models.CL_lookup(alpha);
 CD = models.CD_lookup(alpha);
 
-CD_fuselage = models.CD_fuselage_lookup(alpha);
 %% Force calculations
 
 q = 0.5 * params.rho * (V^2) * params.wing_area; % Dynamic pressure
@@ -43,16 +42,19 @@ end
 
 % Filter for the real, positive physical root corresponding to induced velocity
 alpha_nac = atan(sin(phi)/(lambda_i + cos(phi)));
-V_nac2 = V^2 + (lambda_i*V)^2 + 2*cos(phi)*lambda_i*V^2;
-q_nac = 0.5 * params.rho * (V_nac2) * params.nacelle_area;
+CD_fuselage = models.CD_fuselage_lookup(alpha_nac);
 
-D_nac = CD_fuselage*q_nac;
+
+V_nac2 = V^2 + (lambda_i*V)^2 + 2*cos(phi)*lambda_i*V^2;
+q_nac = 0.5 * params.rho * (V_nac2) ;
+
+D_nac = CD_fuselage*q_nac* params.nacelle_area;
 %% Constraint satisfaction
 
 % Equalities
 
-ceq = [T * cos(phi) - D - D_nac*cos(alpha_nac);  ...                    % Axial force balance
-       L - D_nac*sin(alpha_nac )+ T * sin(phi) - (params.mass * params.g)...  % Normal force balance
+ceq = [T * cos(phi)/(params.mass * params.g) - D/(params.mass * params.g) - D_nac*cos(phi-alpha_nac)/(params.mass * params.g); ...          % Axial force balance
+       L/(params.mass * params.g) - D_nac*sin(phi-alpha_nac)/(params.mass * params.g) + T * sin(phi)/(params.mass * params.g) - 1 ...       % Normal force balance
        ];
 
 % Inequalities

@@ -1,0 +1,13 @@
+function reg = patronus_registry()
+%PATRONUS_REGISTRY Central dispatch table for objectives and constraint sets.
+%   Add a new formulation by adding one line here. Do not edit the main script.
+
+    reg.constraints = containers.Map( ...
+        {'1Wing', '1Wing_Nacelle', '2Wings'}, ...
+        {@cruise_constraints_2GDL, @cruise_constraints_nacelle, @cruise_constraints_3GDL});
+
+    reg.objective = containers.Map( ...
+        {'max_range_1W'}, ...
+        {@cruise_objective_max_range_1W});
+
+end

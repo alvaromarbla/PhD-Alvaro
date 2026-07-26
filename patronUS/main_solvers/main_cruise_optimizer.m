@@ -9,10 +9,10 @@
 % By: Alvaro Martinez Blanco (2026)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+close all 
 %% User version input
 
-versions.AC_version   = "2WING"; % Aicraft Version
+versions.AC_version   = "1WING"; % Aicraft Version
 versions.CL_version   = 'analytical'; % CL model to use
 versions.CD_version   = 'analytical'; % CD model to use
 versions.CT_version   = 'analytical'; % CT model to use
@@ -21,12 +21,27 @@ versions.Batt_version = ' '; % Battery model to use
 
 % Versions for constraints
 % To choose among: 1Wing, 1Wing_Nacelle, 2Wings
-versions.constraints = "2Wings";
+versions.constraints = "1Wing_Nacelle";
+
+% Versions for constraints
+% To choose among: "max_range_1W", "max_range_2W"
+versions.objective = "max_range_1W";
 
 %% Import Casadi and optimizer
 
 import casadi.*
 opti = Opti();
+
+%% Load Registry and Configuration
+
+reg = patronus_registry();
+
+validate_config(versions,reg);
+
+constraint_fcn = reg.constraints(char(versions.constraints));
+objective_fcn  = reg.objective(char(versions.objective));
+
+
 
 %% Initialize configuration
 
@@ -38,48 +53,48 @@ models = models_config(versions);
 
 %% Define Decision Variables
 
-X = opti.variable(8, 1); % [V; gamma; alpha; epsilon1 ; epsilon2; n1; n2;delta_e]
+% Define Decision variables Dynamically
 
-% Apply bounds to states
+var_names = fieldnames(bounds.vars);
+n_vars = numel(var_names);
 
-opti.subject_to(bounds.V.min        <= X(1) <= bounds.V.max);
-opti.subject_to(bounds.gamma.min    <= X(2) <= bounds.gamma.max);
-opti.subject_to(bounds.alpha.min    <= X(3) <= bounds.alpha.max);
-opti.subject_to(bounds.epsilon1.min  <= X(4) <= bounds.epsilon1.max);
-opti.subject_to(bounds.n1.min        <= X(5) <= bounds.n1.max);
-opti.subject_to(bounds.epsilon2.min  <= X(6) <= bounds.epsilon2.max);
-opti.subject_to(bounds.n2.min        <= X(7) <= bounds.n2.max);
-opti.subject_to(bounds.delta_e.min   <= X(8) <= bounds.delta_e.max);
+% Allocate generic optimization vector
 
+X = opti.variable(n_vars,1);
+
+% Dynamically build structurl mapping and apply bounds and Ini values
+
+X_struct = struct();
+
+vars0 = zeros(n_vars,1);
+
+for i = 1:n_vars
+    name = var_names{i};
+    X_struct.(name) = X(i);
+    v_cfg = bounds.vars.(name);
+    opti.subject_to(v_cfg.min <= X(i) <= v_cfg.max);
+    vars0(i) = v_cfg.init;
+end
 %% Apply initial interation for solver
-
-vars0 = [24.225109; deg2rad(0); 0.046444; deg2rad(60); 25.214554; deg2rad(60); 25.214554 ; deg2rad(0)];
-%vars0 = [30; deg2rad(3); 0.1; deg2rad(4); 40];
 opti.set_initial(X, vars0)
 
 %% Call Objective Function
 
-obj_fun = cruise_objective(X, models.CP_lookup, params);
+obj_fun = objective_fcn(X_struct, models, params);
 opti.minimize(obj_fun);
 
 %% Call Constraints
-switch versions.constraints
-    case "1Wing"
-        [c, ceq] = cruise_constraints_2GDL(X, models, params,bounds);
-    case "1Wing_Nacelle"
-        [c, ceq] = cruise_constraints_nacelle(X, models, params,bounds);
-    case "2Wings"
-        [c, ceq] = cruise_constraints_3GDL(X, models, params,bounds);
-    otherwise
-        error("Unknown constraint set selected.")
-end
+
+[c, ceq] = constraint_fcn(X_struct, models, params, bounds);
 
 g_all = [c; ceq];   % keep this handle
 n_ineq = numel(c);
 n_eq   = numel(ceq);
 
-opti.subject_to(c <= 0);
-opti.subject_to(ceq == 0);
+con_ineq = (c   <= 0);
+con_eq   = (ceq == 0);
+opti.subject_to(con_ineq);
+opti.subject_to(con_eq);
 
 hist = IterHistory();
 opti.callback(@(i) hist.record(opti.debug.value(X), opti.debug.value(g_all)));
@@ -91,20 +106,37 @@ opti.solver('ipopt', opts);
 
 %% Run
 
+solve_ok = true; % Status flag
+
 try
     sol_obj = opti.solve();
 
-    % 4. Extract numerical results (Equivalent to your [sol, fval])
-    sol  = sol_obj.value(X);     % Optimized decision variables vector
-    fval = sol_obj.value(obj_fun); % Optimized objective function value
+    sol_raw     = sol_obj.value(X);
+    fval        = sol_obj.value(obj_fun);
+    lagmul_ineq = opti.debug.value(opti.dual(con_ineq));
+    lagmul_eq   = opti.debug.value(opti.dual(con_eq));
+    lam_all     = sol_obj.value(opti.lam_g);
 
 catch e
+    solve_ok = false;                                
     fprintf('Optimization failed or hit limits. Extracting last debug values.\n');
-    sol  = opti.debug.value(X);
-    fval = opti.debug.value(obj_fun);
+    fprintf('  Reason: %s\n', e.message);            
+    sol_obj = [];                                    
+    sol_raw = opti.debug.value(X);
+    fval    = opti.debug.value(obj_fun);
+    lam_all = opti.debug.value(opti.lam_g);         
+    lagmul_ineq = opti.debug.value(opti.dual(con_ineq));  
+    lagmul_eq   = opti.debug.value(opti.dual(con_eq));    
 end
 
-[results, aux] = cruise_postp(sol_obj, X , models, params, fval);
+if solve_ok                                      
+    [results, checks, aux] = cruise_postp(sol_obj, X, models, params, fval,versions);
+    generate_results_page(results, models)
+else
+     warning('Skipping post-processing: no converged solution.');
+end  
+
+% IPOPT Diagnosis 
 
 stats = opti.stats();
 inf_pr = stats.iterations.inf_pr;   % primal infeasibility (constraint violation) per iter
@@ -116,6 +148,5 @@ slack = computeBoundSlack(hist.X_hist, bounds);
 
 history_matrix = hist.X_hist;
 plotIpoptconvergence(history_matrix, bounds);
-
 plotVariableEvolution(hist.X_hist, bounds);
 plotConvergenceMetrics(stats, viol, slack);
