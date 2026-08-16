@@ -17,6 +17,12 @@ if CD_version == "analytical"
 
    
     CD_fuselage_lookup = CD_fuselage_interp;
+elseif CD_version == "dummy"
+
+    alpha = SX.sym('alpha');
+    CD0 = 0.05; CD1 = 0.02; CD2 = 0.10;
+    CD_expr = CD0 + CD1*alpha + CD2*alpha^2;
+    CD_fuselage_lookup = Function('CD_fuselage_lookup', {alpha}, {CD_expr});
 else
     warning('CD version unknown')
 end

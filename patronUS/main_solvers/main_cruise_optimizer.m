@@ -13,9 +13,9 @@ close all
 %% User version input
 
 versions.AC_version   = "2Wings"; % Aicraft Version
-versions.CL_version   = 'analytical'; % CL model to use
-versions.CD_version   = 'analytical'; % CD model to use
-versions.CM_version   = 'analytical'; % CM model to use
+versions.CL_version   = 'dummy'; % CL model to use ("analytical, dummy")
+versions.CD_version   = 'dummy'; % CD model to use ("analytical, dummy")
+versions.CM_version   = 'dummy'; % CM model to use ("analytical, dummy")
 
 
 versions.CT_version   = 'analytical'; % CT model to use

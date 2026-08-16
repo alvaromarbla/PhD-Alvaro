@@ -16,6 +16,13 @@ if CD_version == "analytical"
     CD_tail_interp = interpolant('CD_tail_interp', 'bspline', {alpha_mesh}, CD_tail_mesh);
 
     CD_tail_lookup = CD_tail_interp;
+
+elseif CD_version == "dummy"
+
+    alpha = SX.sym('alpha');
+    CD0 = 0.02; CD1 = 0.03; CD2 = 0.15;   % CD = CD0 + CD1*alpha + CD2*alpha^2
+    CD_expr = CD0 + CD1*alpha + CD2*alpha^2;
+    CD_tail_lookup = Function('CD_tail_lookup', {alpha}, {CD_expr});
 else
     warning('CD version unknown')
 end

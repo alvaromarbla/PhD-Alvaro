@@ -16,6 +16,15 @@ if CL_version == "analytical"
     CL_wing_interp = interpolant('CL_wing_interp', 'bspline', {alpha_mesh}, CL_wing_mesh);
 
     CL_wing_lookup = CL_wing_interp;
+
+elseif CL_version == "dummy"
+
+    alpha = SX.sym('alpha');
+    CL0 = 0.20; CL_alpha = 5.5;
+    CL_expr = CL0 + CL_alpha*alpha;
+    CL_wing_lookup = Function('CL_wing_lookup', {alpha}, {CL_expr});
+
+
 else
     warning('CL version unknown')
 end

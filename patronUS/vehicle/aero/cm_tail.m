@@ -15,6 +15,11 @@ if CM_version == "analytical"
 
     CM_tail_lookup = CM_tail_interp;
 
+elseif CM_version == "dummy"
+    alpha = SX.sym('alpha');
+    CM0 = -0.05; CM_alpha = -0.25;
+    CM_expr = CM0 + CM_alpha*alpha;
+    CM_tail_lookup = Function('CM_tail_lookup', {alpha}, {CM_expr});
 else
     warning('CL version unknown')
 end

@@ -15,6 +15,12 @@ if CM_version == "analytical"
 
     CM_fuselage_lookup = CM_fuselage_interp;
 
+elseif CM_version == "dummy"
+
+    alpha = SX.sym('alpha');
+    CM0 = 0.0; CM_alpha = 0.10;
+    CM_expr = CM0 + CM_alpha*alpha;
+    CM_fuselage_lookup = Function('CM_fuselage_lookup', {alpha}, {CM_expr});
 else
     warning('CL version unknown')
 end

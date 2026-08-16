@@ -25,6 +25,12 @@ CL_fuselage_interp = interpolant('CL_fuselage_interp','bspline',{alpha_mesh},CL_
 
 
 CL_fuselage_lookup = CL_fuselage_interp;
+elseif CL_version == "dummy"
+
+    alpha = SX.sym('alpha');
+    CL0 = 0.0; CL_alpha = 1.2;
+    CL_expr = CL0 + CL_alpha*alpha;
+    CL_fuselage_lookup = Function('CL_fuselage_lookup', {alpha}, {CL_expr});
 
 else
     warning('CL version unknown')
