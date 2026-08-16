@@ -2,7 +2,7 @@ function [params, bounds] = cruise_config(AC_version)
 
 import casadi.*
 
-if AC_version == "1WING"
+if AC_version == "1Wing"
     mass_batt= 3;                                  % [kg]
     E_batt = 720e3*mass_batt;
 
@@ -34,7 +34,7 @@ if AC_version == "1WING"
     bounds.vars.epsilon = struct('min', deg2rad(0),   'max', deg2rad(90),            'init', deg2rad(60));
     bounds.vars.n       = struct('min', 25,                 'max', params.prop.max_rps, 'init', 25.214);
 
-elseif AC_version == "2WING"
+elseif AC_version == "2Wings"
 
     mass_batt= 3;                                  % [kg]
     E_batt = 720e3*mass_batt;
@@ -45,6 +45,7 @@ elseif AC_version == "2WING"
     params.Iyy_nac = 0.06469;                       % [kg m^2]
 
     params.wing_area = 0.48186;                     % [m²]
+    params.tailwing_area = 0.48186;                 % [m²]
     params.fus_area  = 0.4094;                      % [m²]
     params.fus_Lref  = 1.75;                        % [m]
 
@@ -54,6 +55,7 @@ elseif AC_version == "2WING"
     params.prop.T_max_eng = 238.383;               % [N] Max thrust per engine
     params.prop.P_max_eng = 6.7e3;                 % [W] Max power per engine
     params.prop.eff = 0.8192;%0.733;                    % [-] Efficiency of engines
+    params.prop.nacelle_area = 0.01774;             % [m²]
     params.rho = 1.2133;                           % [kg/m³]
     params.g = 9.81;                               % [m/s²]
     params.deltaH = 350;                           % [m] Climb altitude
@@ -64,8 +66,8 @@ elseif AC_version == "2WING"
     params.geo.c_wing = 0.23;                       % [m] Mean wing chord
     params.geo.xw     = 0.707;                      % [m] X distance
     params.geo.zw     = 0.0805;
-    params.geo.xfus   = NaN;
-    params.geo.zfus   = NaN;
+    params.geo.xfus   = 0.707/2; %%%%% THESE ARE TO CHANGE
+    params.geo.zfus   = 0.0805/2; %%%%% THESE ARE TO CHANGE
     params.geo.xtw    = 0.619;
     params.geo.ztw    = 0.1935;
 
@@ -77,17 +79,18 @@ elseif AC_version == "2WING"
     % Operational bounds (all values in SI units)
     bounds.vars.V        = struct('min', 10,               'max', 40,                    'init', 30.0);
     bounds.vars.gamma    = struct('min', deg2rad(-0.5),'max', deg2rad(0.5),               'init', deg2rad(0));
+    bounds.vars.theta    = struct('min', deg2rad(-30), 'max', deg2rad(45),                'init', deg2rad(0.1));
     bounds.vars.alpha    = struct('min', deg2rad(-30), 'max', deg2rad(45),                'init', 0.1);
     bounds.vars.epsilon1 = struct('min', deg2rad(0),   'max', deg2rad(90),                'init', deg2rad(4));
     bounds.vars.epsilon2 = struct('min', deg2rad(0),   'max', deg2rad(90),                'init', deg2rad(4));
     bounds.vars.q        = struct('min', -0.6,             'max', 0.6,                    'init', 0); % Rad/s
-    bounds.vars.theta    = struct('min', deg2rad(-45), 'max', deg2rad(60),                'init', 0); % Rad/s
 
     % Controls
     bounds.vars.n1   = struct('min', 25,   'max', params.prop.max_rps, 'init', 40.0);
     bounds.vars.n2   = struct('min', 25,   'max', params.prop.max_rps, 'init', 40.0);
-    bounds.vars.tau1 = struct('min', -5,   'max', 5,                   'init', 0.0);
-    bounds.vars.tau2 = struct('min', -5,   'max', 5,                   'init', 0.0);
+    % bounds.vars.tau1 = struct('min', -5,   'max', 5,                   'init', 0.0);
+    % bounds.vars.tau2 = struct('min', -5,   'max', 5,                   'init', 0.0);
+    bounds.vars.deltae = struct('min', deg2rad(-20), 'max', deg2rad(20),                  'init', 0);
 
 else
     warning('AC version unknown')

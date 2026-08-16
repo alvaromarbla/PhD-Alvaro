@@ -12,20 +12,25 @@
 close all 
 %% User version input
 
-versions.AC_version   = "1WING"; % Aicraft Version
+versions.AC_version   = "2Wings"; % Aicraft Version
 versions.CL_version   = 'analytical'; % CL model to use
 versions.CD_version   = 'analytical'; % CD model to use
+versions.CM_version   = 'analytical'; % CM model to use
+
+
 versions.CT_version   = 'analytical'; % CT model to use
 versions.CP_version   = 'analytical'; % CP model to use
+versions.CH_version   = 'zeros'; % CH model to use
+
 versions.Batt_version = ' '; % Battery model to use
 
 % Versions for constraints
 % To choose among: 1Wing, 1Wing_Nacelle, 2Wings
-versions.constraints = "1Wing_Nacelle";
+versions.constraints = "2Wings";
 
 % Versions for constraints
 % To choose among: "max_range_1W", "max_range_2W"
-versions.objective = "max_range_1W";
+versions.objective = "max_range_2W";
 
 %% Import Casadi and optimizer
 
@@ -34,12 +39,12 @@ opti = Opti();
 
 %% Load Registry and Configuration
 
-reg = patronus_registry();
+registry = patronus_registry();
 
-validate_config(versions,reg);
+validate_config(versions,registry);
 
-constraint_fcn = reg.constraints(char(versions.constraints));
-objective_fcn  = reg.objective(char(versions.objective));
+constraint_fcn = registry.constraints(char(versions.constraints));
+objective_fcn  = registry.objective(char(versions.objective));
 
 
 

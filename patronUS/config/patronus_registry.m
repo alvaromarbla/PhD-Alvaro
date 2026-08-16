@@ -7,7 +7,7 @@ function reg = patronus_registry()
         {@cruise_constraints_2GDL, @cruise_constraints_nacelle, @cruise_constraints_3GDL});
 
     reg.objective = containers.Map( ...
-        {'max_range_1W'}, ...
-        {@cruise_objective_max_range_1W});
+        {'max_range_1W','max_range_2W'}, ...
+        {@cruise_objective_max_range_1W, @cruise_objective_max_range_2W});
 
 end

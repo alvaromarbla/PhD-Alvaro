@@ -1,16 +1,16 @@
-function [c, ceq] = cruise_constraints_3GDL(x, models, params, bounds)
+function [c, ceq] = cruise_constraints_3GDL(X_struct, models, params, bounds)
+% Steady State constraints
 
-% Unpack variables to match the 5-element vector: [V, gamma, alpha, epsilon, n]
-V       = x(1);
-gamma   = x(2); % Steady cruise implies gamma = 0, which is handled via bounds or optimization rules
-theta   = x(3);
-epsilon1 = x(4);
-epsilon2 = x(5);
-n1      = x(6);
-n2      = x(7);
+V       = X_struct.V;
+gamma   = X_struct.gamma; % Steady cruise implies gamma = 0, which is handled via bounds or optimization rules
+theta   = X_struct.theta;
+epsilon1 = X_struct.epsilon1;
+epsilon2 = X_struct.epsilon2;
+n1      = X_struct.n1;
+n2      = X_struct.n2;
 % tau1     = x(8);
 % tau2     = x(9);
-delta_e = x(8);
+delta_e = X_struct.deltae;
 
 alpha = theta-gamma;
 xi_dw = downwash_calc(alpha); %%%%%%%
@@ -32,16 +32,18 @@ CH2 = models.CH_lookup(J2,phi2);
 
 %% Call B-spline models on aero forces:
 
-CL_wing = models.CL_lookup_wing(alpha);
-CD_wing = models.CD_lookup_wing(alpha);
+CL_wing = models.CL_wing_lookup(alpha);
+CD_wing = models.CD_wing_lookup(alpha);
+CM_wing = models.CM_wing_lookup(alpha);
 
-CL_fus = models.CL_lookup_fus(alpha);
-CD_fus = models.CD_lookup_fus(alpha);
+CL_fus = models.CL_fuselage_lookup(alpha);
+CD_fus = models.CD_fuselage_lookup(alpha);
+CM_fus = models.CM_fuselage_lookup(alpha);
 
-CL_tailwing = models.CL_lookup_tailwing(alpha-xi_dw,delta_e);
-CD_tailwing = models.CD_lookup_tailwing(alpha-xi_dw,delta_e);
+CL_tailwing = models.CL_tail_lookup(alpha-xi_dw); %, delta_e)
+CD_tailwing = models.CD_tail_lookup(alpha-xi_dw); %, delta_e)
+CM_tailwing = models.CM_tail_lookup(alpha); %, delta_e)
 
-CM         = models.CM_lookup(alpha, delta_e);
 %% Force calculations
 
 q = 0.5 * params.rho * (V^2); % Dynamic pressure
@@ -87,7 +89,7 @@ CD_nac1 = models.CD_nac_lookup(alpha_nac1);
 V1_nac2 = V^2 + (lambda_i1*V)^2 + 2*cos(phi1)*lambda_i1*V^2;
 q_nac1 = 0.5 * params.rho * (V1_nac2) ;
 
-D_nac1 = CD_nac1*q_nac1* params.nacelle_area*params.prop.num_engines; % Area accounts for ONE engine
+D_nac1 = CD_nac1*q_nac1* params.prop.nacelle_area*params.prop.num_engines; % Area accounts for ONE engine
 
 % NACELLE 2
 kappa2 = T2/(0.5 * params.rho * params.prop.diameter^2*V^2);
@@ -110,7 +112,7 @@ CD_nac2 = models.CD_nac_lookup(alpha_nac2);
 V2_nac2 = V^2 + (lambda_i2*V)^2 + 2*cos(phi2)*lambda_i2*V^2;
 q_nac2 = 0.5 * params.rho * (V2_nac2) ;
 
-D_nac2 = CD_nac2*q_nac2* params.nacelle_area*params.prop.num_engines; % Area accounts for ONE engine
+D_nac2 = CD_nac2*q_nac2* params.prop.nacelle_area*params.prop.num_engines; % Area accounts for ONE engine
 
 %% Sum aero Forces
 
@@ -124,28 +126,33 @@ D_tailwing_wind = D_tailwing*cos(xi_dw) + L_tailwing*sin(xi_dw);
 
 %% Definition of Terms for the moments equation ( to ease up the constraint shape)
 
-MA = q*params.wing_area*params.cref*CM; % Aero moment
-Inertia_nac1 = params.I_yy1 *epsilon1dotdot;
-Inertia_nac2 = params.I_yy2 *epsilon2dotdot;
+MA_wing = q*params.wing_area*params.geo.c_wing*CM_wing; % Aero moment
+MA_fus  = q*params.fus_area*params.fus_Lref*CM_fus; % Aero moment
+MA_tail = q*params.wing_area*params.geo.c_wing*CM_tailwing; % Aero moment
 
-M_Fus = L_fus*cos(alpha)*params.x_fus - L_fus*sin(alpha)*params.z_fus...
-    +D_fus*sin(alpha)*params.x_fus - D_fus*cos(alpha)*params.z_fus; % Fuselage contribution
+MA = MA_wing + MA_fus + MA_tail;
 
-M_Wing = L_wing* cos(alpha)*params.x_wing -L_wing*sin(alpha)*params.z_wing...
-    +D_wing*sin(alpha)*params.x_wing + D_wing*cos(alpha)*params.z_wing; % Wing contribution
+% Inertia_nac1 = params.I_yy1 *epsilon1dotdot;
+% Inertia_nac2 = params.I_yy2 *epsilon2dotdot;
 
-M_Tail = - L_tailwing_wind*cos(alpha)*params.x_tail - L_tailwing_wind*sin(alpha)*params.z_tail...
-    -D_tailwing_wind*sin(alpha)*params.x_tail + D_tailwing_wind*cos(alpha)*params.z_tail; % Tail wing contribution
+M_Fus = L_fus*cos(alpha)*params.geo.xfus - L_fus*sin(alpha)*params.geo.zfus...
+    +D_fus*sin(alpha)*params.geo.xfus  - D_fus*cos(alpha)*params.geo.zfus; % Fuselage contribution
 
-M_Eng1 = T1*sin(epsilon1)*params.x_wing - T1*cos(epsilon1)*params.z_wing ...
-    + H1*cos(epsilon1)*params.x_wing + H1*sin(epsilon1)*params.z_wing;
+M_Wing = L_wing* cos(alpha)*params.geo.xw -L_wing*sin(alpha)*params.geo.zw...
+    +D_wing*sin(alpha)*params.geo.xw + D_wing*cos(alpha)*params.geo.zw; % Wing contribution
 
-M_Eng2 = -T2*sin(epsilon2)*params.x_tail - T2*cos(epsilon2)*params.z_tail ...
-    - H2*cos(epsilon2)*params.x_tail + H2*sin(epsilon2)*params.z_tail;
+M_Tail = - L_tailwing_wind*cos(alpha)*params.geo.xtw - L_tailwing_wind*sin(alpha)*params.geo.ztw...
+    -D_tailwing_wind*sin(alpha)*params.geo.xtw + D_tailwing_wind*cos(alpha)*params.geo.ztw; % Tail wing contribution
 
-M_Nac1 = D_nac1*sin(epsilon1-alpha_nac1)*params.x_wing + D_nac1*cos(epsilon1-alpha_nac1)*params.z_wing;
+M_Eng1 = T1*sin(epsilon1)*params.geo.xtw - T1*cos(epsilon1)*params.geo.ztw ...
+    + H1*cos(epsilon1)*params.geo.xtw + H1*sin(epsilon1)*params.geo.ztw;
 
-M_Nac2 = -D_nac2*sin(epsilon2-alpha_nac2)*params.x_tail + D_nac2*cos(epsilon2-alpha_nac2)*params.z_tail;
+M_Eng2 = -T2*sin(epsilon2)*params.geo.xtw - T2*cos(epsilon2)*params.geo.ztw ...
+    - H2*cos(epsilon2)*params.geo.xtw + H2*sin(epsilon2)*params.geo.ztw;
+
+M_Nac1 = D_nac1*sin(epsilon1-alpha_nac1)*params.geo.xw + D_nac1*cos(epsilon1-alpha_nac1)*params.geo.zw;
+
+M_Nac2 = -D_nac2*sin(epsilon2-alpha_nac2)*params.geo.xtw + D_nac2*cos(epsilon2-alpha_nac2)*params.geo.ztw;
 
 %% Constraint satisfaction
 
@@ -153,7 +160,7 @@ M_Nac2 = -D_nac2*sin(epsilon2-alpha_nac2)*params.x_tail + D_nac2*cos(epsilon2-al
 
 ceq = [  T1*cos(phi1) + T2*cos(phi2) - H1*sin(phi1)- H2*sin(phi2)-D_Tot-params.mass*params.g*sin(gamma); % Long forces (m*vdot = ...)
          T1*sin(phi1) + T2*sin(phi2) + H1*cos(phi1)+ H2*cos(phi2)+L_Tot-params.mass*params.g*cos(gamma); % Trans forces (m*V*gammadot = ...)
-         MA -Inertia_nac1 - Inertia_nac2 + M_Wing + M_Fus + M_Tail+  M_Nac1 + M_Nac2 + M_Eng1 + M_Eng2; % Moments (qdot* Iyy = ...)
+         MA + M_Wing + M_Fus + M_Tail+  M_Nac1 + M_Nac2 + M_Eng1 + M_Eng2; % Moments (qdot* Iyy = ...)
          gamma % force gamma = 0
     ];
 
@@ -163,6 +170,7 @@ ceq = [  T1*cos(phi1) + T2*cos(phi2) - H1*sin(phi1)- H2*sin(phi2)-D_Tot-params.m
 % Inequalities
 
 c = [-V/(n1*params.prop.diameter)  ; ...
+    -V/(n2*params.prop.diameter);...
     -CT1;...
     -CT2;...
     -CP1;  ...
