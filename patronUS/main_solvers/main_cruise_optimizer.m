@@ -90,7 +90,57 @@ opti.minimize(obj_fun);
 
 %% Call Constraints
 
-[c, ceq] = constraint_fcn(X_struct, models, params, bounds);
+[c, ceq, diag] = constraint_fcn(X_struct, models, params, bounds); % Can have diagnosis ( or not) 
+
+
+%%%%%%%%%%%%%%%%%% EVALUATE INITIAL ( TRIM ) POINT %%%%%%%%%%%%%%%%%%
+
+if exist("diag","var")
+
+diag_names = fieldnames(diag);
+    diag_exprs = {};
+    for k = 1:numel(diag_names)
+        diag_exprs{end+1} = diag.(diag_names{k});
+    end
+
+    % Build a CasADi Function: X (numeric vector) -> all diag fields
+    trim_eval = Function('trim_eval', {X}, diag_exprs, {'X'}, diag_names);
+
+    % Evaluate at the initial guess vars0 (plain doubles)
+    diag_vals_cell = cell(1, numel(diag_names));
+    [diag_vals_cell{:}] = trim_eval(vars0);
+
+    % Repack into a plain MATLAB struct of doubles
+    diag0 = struct();
+    for k = 1:numel(diag_names)
+        diag0.(diag_names{k}) = full(diag_vals_cell{k});
+    end
+
+    fprintf('alpha = %.3f deg | phi1 = %.3f deg | phi2 = %.3f deg\n', ...
+        rad2deg(diag0.alpha), rad2deg(diag0.phi1), rad2deg(diag0.phi2));
+    fprintf('n1 = %.3f rps | n2 = %.3f rps\n', ...
+        diag0.n1, diag0.n2);
+
+
+    fprintf('\n--- FORCE BREAKDOWN [N] ---\n');
+    fprintf('T1 = %10.2f   T2 = %10.2f   H1 = %10.2f   H2 = %10.2f\n', diag0.T1, diag0.T2, diag0.H1, diag0.H2);
+    fprintf('D_wing = %8.2f  D_fus = %8.2f  D_tail = %8.2f  D_nac1 = %8.2f  D_nac2 = %8.2f  D_Tot = %8.2f\n', ...
+        diag0.D_wing, diag0.D_fus, diag0.D_tailwing, diag0.D_nac1, diag0.D_nac2, diag0.D_Tot);
+    fprintf('L_wing = %8.2f  L_fus = %8.2f  L_tail = %8.2f  L_Tot  = %8.2f  Weight = %8.2f\n', ...
+        diag0.L_wing, diag0.L_fus, diag0.L_tailwing, diag0.L_Tot, diag0.weight);
+
+    fprintf('\n--- MOMENT BREAKDOWN [N*m] ---\n');
+    fprintf('MA_wing = %8.2f  MA_fus = %8.2f  MA_tail = %8.2f\n', diag0.MA_wing, diag0.MA_fus, diag0.MA_tail);
+    fprintf('M_Wing  = %8.2f  M_Fus  = %8.2f  M_Tail  = %8.2f\n', diag0.M_Wing, diag0.M_Fus, diag0.M_Tail);
+    fprintf('M_Eng1  = %8.2f  M_Eng2 = %8.2f  M_Nac1  = %8.2f  M_Nac2 = %8.2f\n', ...
+        diag0.M_Eng1, diag0.M_Eng2, diag0.M_Nac1, diag0.M_Nac2);
+
+    fprintf('\n--- CEQ RESIDUALS ---\n');
+    fprintf('Long force (should be 0): %10.3f  N\n', diag0.ceq(1));
+    fprintf('Trans force (should be 0): %10.3f  N\n', diag0.ceq(2));
+    fprintf('Moment (should be 0):      %10.3f  N*m\n', diag0.ceq(3));
+end
+
 
 g_all = [c; ceq];   % keep this handle
 n_ineq = numel(c);

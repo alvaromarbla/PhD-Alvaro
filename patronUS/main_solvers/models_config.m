@@ -27,7 +27,7 @@ models.CM_tail_lookup = cm_tail(versions.CD_version);
 % Prop
 models.CT_lookup = ct_model(versions.CT_version);
 models.CP_lookup = cp_model(versions.CP_version);
-models.CH_lookup = ch_model(versions.CP_version);
+models.CH_lookup = ch_model(versions.CH_version);
 
 % Nac
 

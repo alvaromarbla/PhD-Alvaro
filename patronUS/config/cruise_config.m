@@ -40,7 +40,7 @@ elseif AC_version == "2Wings"
     E_batt = 720e3*mass_batt;
 
     % Physical parameters
-    params.mass = 255.4;                           % [kg]
+    params.mass = 25.54;         %  255.4 says CAD?                 % [kg]
     params.Iyy  = 98.19;                            % [kg m^2]
     params.Iyy_nac = 0.06469;                       % [kg m^2]
 
@@ -79,15 +79,15 @@ elseif AC_version == "2Wings"
     % Operational bounds (all values in SI units)
     bounds.vars.V        = struct('min', 10,               'max', 40,                    'init', 30.0);
     bounds.vars.gamma    = struct('min', deg2rad(0),'max', deg2rad(0),               'init', deg2rad(0));
-    bounds.vars.theta    = struct('min', deg2rad(-30), 'max', deg2rad(45),                'init', deg2rad(0.1));
-    bounds.vars.alpha    = struct('min', deg2rad(-30), 'max', deg2rad(45),                'init', 0.1);
+    bounds.vars.theta    = struct('min', deg2rad(-30), 'max', deg2rad(45),                'init', deg2rad(3));
+    bounds.vars.alpha    = struct('min', deg2rad(-30), 'max', deg2rad(45),                'init', deg2rad(3));
     bounds.vars.epsilon1 = struct('min', deg2rad(0),   'max', deg2rad(90),                'init', deg2rad(4));
     bounds.vars.epsilon2 = struct('min', deg2rad(0),   'max', deg2rad(90),                'init', deg2rad(4));
     bounds.vars.q        = struct('min', -0.6,             'max', 0.6,                    'init', 0); % Rad/s
 
     % Controls
-    bounds.vars.n1   = struct('min', 25,   'max', params.prop.max_rps, 'init', 40.0);
-    bounds.vars.n2   = struct('min', 25,   'max', params.prop.max_rps, 'init', 40.0);
+    bounds.vars.n1   = struct('min', 20,   'max', params.prop.max_rps, 'init', 25.0);
+    bounds.vars.n2   = struct('min', 20,   'max', params.prop.max_rps, 'init', 25.0);
     % bounds.vars.tau1 = struct('min', -5,   'max', 5,                   'init', 0.0);
     % bounds.vars.tau2 = struct('min', -5,   'max', 5,                   'init', 0.0);
     bounds.vars.deltae = struct('min', deg2rad(-20), 'max', deg2rad(20),                  'init', 0);

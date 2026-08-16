@@ -1,4 +1,4 @@
-function [c, ceq] = cruise_constraints_3GDL(X_struct, models, params, bounds)
+function [c, ceq, diag] = cruise_constraints_3GDL(X_struct, models, params, bounds)
 % Steady State constraints
 
 V       = X_struct.V;
@@ -181,5 +181,22 @@ c = [-V/(n1*params.prop.diameter)  ; ...
     P2 - params.prop.P_max_eng*params.prop.num_engines;...
     J1-1.2;...
     J2-1.2];
+
+if nargout > 2
+    diag.alpha = alpha;       diag.phi1 = phi1;      diag.phi2 = phi2;
+    diag.n1 = n1;             diag.n2 = n2;
+    diag.T1 = T1;             diag.T2 = T2;
+    diag.H1 = H1;             diag.H2 = H2;
+    diag.D_wing = D_wing;     diag.D_fus = D_fus;    diag.D_tailwing = D_tailwing;
+    diag.D_nac1 = D_nac1;     diag.D_nac2 = D_nac2;  diag.D_Tot = D_Tot;
+    diag.L_wing = L_wing;     diag.L_fus = L_fus;    diag.L_tailwing = L_tailwing;
+    diag.L_Tot = L_Tot;
+    diag.MA_wing = MA_wing;   diag.MA_fus = MA_fus;  diag.MA_tail = MA_tail;
+    diag.M_Wing = M_Wing;     diag.M_Fus = M_Fus;    diag.M_Tail = M_Tail;
+    diag.M_Eng1 = M_Eng1;     diag.M_Eng2 = M_Eng2;
+    diag.M_Nac1 = M_Nac1;     diag.M_Nac2 = M_Nac2;
+    diag.weight = params.mass*params.g;
+    diag.ceq = ceq;
+end
 
 end
