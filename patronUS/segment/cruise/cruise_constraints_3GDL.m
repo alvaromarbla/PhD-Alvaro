@@ -158,10 +158,10 @@ M_Nac2 = -D_nac2*sin(epsilon2-alpha_nac2)*params.geo.xtw + D_nac2*cos(epsilon2-a
 
 % Equalities
 
-ceq = [  T1*cos(phi1) + T2*cos(phi2) - H1*sin(phi1)- H2*sin(phi2)-D_Tot-params.mass*params.g*sin(gamma); % Long forces (m*vdot = ...)
-         T1*sin(phi1) + T2*sin(phi2) + H1*cos(phi1)+ H2*cos(phi2)+L_Tot-params.mass*params.g*cos(gamma); % Trans forces (m*V*gammadot = ...)
+ceq = [  T1*cos(phi1) + T2*cos(phi2) - H1*sin(phi1)- H2*sin(phi2)-D_Tot; % Long forces (m*vdot = ...)
+         T1*sin(phi1) + T2*sin(phi2) + H1*cos(phi1)+ H2*cos(phi2)+L_Tot-params.mass*params.g; % Trans forces (m*V*gammadot = ...)
          MA + M_Wing + M_Fus + M_Tail+  M_Nac1 + M_Nac2 + M_Eng1 + M_Eng2; % Moments (qdot* Iyy = ...)
-         gamma % force gamma = 0
+          % force gamma = 0
     ];
 
 %tau1 = Inertia_nac1*epsilon1dotdot; % Reaction torque for Nac 1
