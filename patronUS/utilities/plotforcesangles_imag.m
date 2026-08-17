@@ -1,18 +1,29 @@
-function plotforcesangles_imag(ax, results)
+function plotforcesangles_imag(ax, results,params)
 
     % Extract parameters from your optimization pipeline
-    V = results.V_opt;
-    gamma = results.gamma_opt;
-    alpha = results.alpha_opt;
-    epsilon = results.epsilon_opt;
-    alpha_nac = results.alpha_nac;
+    V = results.opt.V;
+    gamma = results.opt.gamma;
+    alpha = results.opt.alpha;
+    epsilon1 = results.opt.epsilon1;
+    epsilon2 = results.opt.epsilon2;
+    xi_dw  = results.xi_dw;
 
-    L = results.L_opt;
-    D = results.D_opt;
-    T = results.T_opt;
-    W = results.W_opt;
-    D_nac = results.D_nac_opt;
-    phi = alpha + epsilon;
+    L_wing = results.L_wing;
+    D_wing = results.D_wing;
+    L_fuselage = results.L_fuselage;
+    D_fuselage = results.D_fuselage;
+    L_tail = results.L_tail;
+    D_tail = results.D_tail;
+    alpha_nac1 = results.alpha_nac1;
+    alpha_nac2 = results.alpha_nac2;
+
+    T1 = results.T1;
+    T2 = results.T2;
+    W = results.W;
+    D_nac1 = results.D_nac1;
+    D_nac2 = results.D_nac2;
+    phi1 = alpha + epsilon1;
+    phi2 = alpha + epsilon2;
 
     % Core Axis Setup
     axes(ax);
@@ -32,99 +43,117 @@ function plotforcesangles_imag(ax, results)
         img_nac = uint8(150 * ones(40, 60, 3)); alpha_nac_img = ones(40, 60);
     end
 
+
     % Physical scaling boundaries for your CAD images
-    fuse_width = 2.0; fuse_height = 1.0;
-    nac_width = 0.6;  nac_height = 0.3;
+    fuse_width = 2.2; fuse_height = 0.8;
+    nac_width = 0.5;  nac_height = 0.2;
 
-    % Define wing attachments relative to fuselage CAD center (0,0)
-    % Example configuration for a front and rear tandem wing layout
-    wing_offsets = [
-        0.4,  0.1;  % Wing 1 (Front Pair) [X, Y]
-        -0.5, 0.15  % Wing 2 (Rear Pair) [X, Y]
-    ];
-
-    % Parent Fuselage Transform (Rotates with aircraft Alpha)
+    % Parent Fuselage Transformation Object (Rotates dynamically with pitch alpha)
     t_fuse = hgtransform('Parent', ax);
     img_h1 = imagesc(ax, [-fuse_width/2, fuse_width/2], [fuse_height/2, -fuse_height/2], img_fuse, 'Parent', t_fuse);
     set(img_h1, 'AlphaData', alpha_fuse);
-
-    % Apply overall pitch angle rotation (alpha) to fuselage
     set(t_fuse, 'Matrix', makehgtform('zrotate', alpha));
 
-    % Child Nacelle Transforms (Attach to Fuselage, rotate by alpha_nac)
-    for i = 1:2
-        % Create the transform handle directly as a child of t_fuse
-        t_nac(i) = hgtransform('Parent', t_fuse);
+    % Child Nacelle Transformations (Attached to physical structure positions)
+    % Nacelle 1 (Wing location mount)
+    t_nac1 = hgtransform('Parent', t_fuse);
+    img_n1 = imagesc(ax, [-nac_width/2, nac_width/2], [nac_height/2, -nac_height/2], img_nac, 'Parent', t_nac1);
+    set(img_n1, 'AlphaData', alpha_nac_img);
+    set(t_nac1, 'Matrix', makehgtform('translate', [params.geo.xw, params.geo.zw, 0]) * makehgtform('zrotate', epsilon1));
 
-        img_n = imagesc(ax, [-nac_width/2, nac_width/2], [nac_height/2, -nac_height/2], img_nac, 'Parent', t_nac(i));
-        set(img_n, 'AlphaData', alpha_nac_img);
+    % Nacelle 2 (Tail location mount)
+    t_nac2 = hgtransform('Parent', t_fuse);
+    img_n2 = imagesc(ax, [-nac_width/2, nac_width/2], [nac_height/2, -nac_height/2], img_nac, 'Parent', t_nac2);
+    set(img_n2, 'AlphaData', alpha_nac_img);
+    set(t_nac2, 'Matrix', makehgtform('translate', [params.geo.xtw, params.geo.ztw, 0]) * makehgtform('zrotate', epsilon2));
 
-        % Translate to wing mount, then apply local thrust tilt angle
-        set(t_nac(i), 'Matrix', makehgtform('translate', [wing_offsets(i,:), 0]) * makehgtform('zrotate', alpha_nac));
-    end
+    %% 3. Station Origin Tracking Matrices (Global Coordinates)
+    % Rotational matrix tracking the body coordinate frame transformation
+    R_body = [cos(alpha), -sin(alpha); sin(alpha), cos(alpha)];
 
-    %% 2. FORCE VECTOR PLOTTING
-    % Reference Grid Lines
-    plot(ax, [-2 2], [0 0], 'k--', 'LineWidth', 0.5);
-    plot(ax, [0 0], [-2 2], 'k--', 'LineWidth', 0.5);
-    text(ax, 1.8, 0.1, 'Horiz', 'FontSize', 9);
+    % Transform CAD offset boundaries into current global frame positions
+    pos_CG   = [0; 0]; % Center of mass chosen as reference origin (0,0)
+    pos_wing = R_body * [params.geo.xw;  params.geo.zw];
+    pos_fus  = R_body * [params.geo.xfus; params.geo.zfus];
+    pos_tail = R_body * [params.geo.xtw;  params.geo.ztw];
 
-    % Scaling pipeline
-    max_force = max([L, D, W, T]);
-    scale = 0.8 / max_force;
+    %% 4. Vector Force Computations & Plot Scaling Pipeline
+    % Determine consistent visual layout vector scaling limits
+    max_force = max([L_wing, D_wing, W, T1, T2, L_tail]);
+    scale = 0.6 / max_force;
 
-    % Airframe Global forces (Origin 0,0)
-    quiver(ax, 0, 0, 0, -W*scale, 'LineWidth', 2, 'MaxHeadSize', 0.3, 'Color', 'k');
+    % Baseline Freestream Vectors (Freestream airflow acts relative to gamma angle)
+    dir_freestream = [cos(gamma), sin(gamma)];
+    dir_free_lift  = [-dir_freestream(2), dir_freestream(1)];
+    dir_free_drag  = -dir_freestream;
 
-    airflow_dir = [cos(gamma), sin(gamma)];
-    plot(ax, [0 airflow_dir(1)], [0 airflow_dir(2)], 'b--', 'LineWidth', 1.2);
+    % --- STATION 1: CENTER OF MASS ---
+    quiver(ax, pos_CG(1), pos_CG(2), 0, -W*scale, 'LineWidth', 2.5, 'MaxHeadSize', 0.4, 'Color', 'k');
+    text(ax, pos_CG(1), pos_CG(2) - W*scale - 0.1, 'Weight', 'Color', 'k', 'FontWeight', 'bold', 'HorizontalAlignment', "center");
 
-    lift_dir = [-airflow_dir(2), airflow_dir(1)];
-    quiver(ax, 0, 0, lift_dir(1)*L*scale, lift_dir(2)*L*scale, 'LineWidth', 2, 'MaxHeadSize', 0.3, 'Color', [0 0.6 0]);
+    % --- STATION 2: MAIN WING ---
+    % Thrust 1 Vector (oriented at phi1 relative to horizontal)
+    dir_T1 = [cos(phi1), sin(phi1)];
+    quiver(ax, pos_wing(1), pos_wing(2), dir_T1(1)*T1*scale, dir_T1(2)*T1*scale, 'LineWidth', 2, 'Color', 'm');
 
-    drag_dir = -airflow_dir;
-    quiver(ax, 0, 0, drag_dir(1)*D*scale, drag_dir(2)*D*scale, 'LineWidth', 2, 'MaxHeadSize', 0.3, 'Color', 'r');
+    % Wing Aerodynamic Forces (align with freestream airflow)
+    quiver(ax, pos_wing(1), pos_wing(2), dir_free_lift(1)*L_wing*scale, dir_free_lift(2)*L_wing*scale, 'LineWidth', 2, 'Color', [0 0.5 0]);
+    quiver(ax, pos_wing(1), pos_wing(2), dir_free_drag(1)*D_wing*scale, dir_free_drag(2)*D_wing*scale, 'LineWidth', 2, 'Color', 'r');
 
-    % Loop over the 2 wing stations to plot thrust and local nacelle drag
-    for i = 1:2
-        % Calculate global coordinate position of the rotated wing tip
-        % This ensures arrows track perfectly with the image rotation
-        R_matrix = [cos(alpha), -sin(alpha); sin(alpha), cos(alpha)];
-        global_wing_pos = R_matrix * wing_offsets(i,:)';
-        wx = global_wing_pos(1);
-        wy = global_wing_pos(2);
+    % Nacelle 1 Structural Drag (acts at alpha_nac1 relative to freestream local vector)
+    dir_D_nac1 = -[cos(alpha_nac1), sin(alpha_nac1)];
+    quiver(ax, pos_wing(1), pos_wing(2), dir_D_nac1(1)*D_nac1*scale, dir_D_nac1(2)*D_nac1*scale, 'LineWidth', 1.5, 'Color', [0.8 0.4 0]);
 
-        % Local Thrust Vector (Acting at wing mount location)
-        thrust_dir = [cos(phi), sin(phi)];
-        quiver(ax, wx, wy, thrust_dir(1)*(T/2)*scale, thrust_dir(2)*(T/2)*scale, 'LineWidth', 2, 'MaxHeadSize', 0.3, 'Color', 'm');
+    % --- STATION 3: FUSELAGE AERO CENTER ---
+    % Fuselage Aerodynamic Forces (align with freestream airflow)
+    quiver(ax, pos_fus(1), pos_fus(2), dir_free_lift(1)*L_fuselage*scale, dir_free_lift(2)*L_fuselage*scale, 'LineWidth', 2, 'Color', [0 0.7 0]);
+    quiver(ax, pos_fus(1), pos_fus(2), dir_free_drag(1)*D_fuselage*scale, dir_free_drag(2)*D_fuselage*scale, 'LineWidth', 2, 'Color', [0.9 0.1 0]);
 
-        % Nacelle Drag Vector
-        drag_nac_dir = [cos(phi+pi-alpha_nac), sin(phi+pi-alpha_nac)];
-        quiver(ax, wx, wy, drag_nac_dir(1)*(D_nac/2)*scale, drag_nac_dir(2)*(D_nac/2)*scale, ...
-            'LineWidth', 1.5, 'MaxHeadSize', 0.3, 'Color', [0.8 0.3 0]);
-    end
+    % --- STATION 4: TAIL STATION ---
+    % Tail Local Airflow Angle (Freestream modified directly by downwash angle xi_dw)
+    gamma_tail = gamma - xi_dw;
+    dir_tail_lift = [-sin(gamma_tail), cos(gamma_tail)];
+    dir_tail_drag = -[cos(gamma_tail), sin(gamma_tail)];
 
-    %% 3. ARCS & LABELS
-    angle_scale = 0.4;
-    DrawLocalArc(ax, 0, gamma, angle_scale, 'b', '\gamma');
-    DrawLocalArc(ax, gamma, alpha, angle_scale*0.8, 'r', '\alpha');
-    DrawLocalArc(ax, gamma + alpha, epsilon, angle_scale*0.6, 'm', '\epsilon');
+    % Tail Aerodynamic Forces (Aligned with the downwash modified airflow)
+    quiver(ax, pos_tail(1), pos_tail(2), dir_tail_lift(1)*L_tail*scale, dir_tail_lift(2)*L_tail*scale, 'LineWidth', 2, 'Color', [0.1 0.6 0.3]);
+    quiver(ax, pos_tail(1), pos_tail(2), dir_tail_drag(1)*D_tail*scale, dir_tail_drag(2)*D_tail*scale, 'LineWidth', 2, 'Color', [0.7 0.2 0.2]);
 
-    % Text Callouts
-    text(ax, 0, -W*scale-0.15, 'Weight', 'Color', 'k', 'HorizontalAlignment', 'center');
-    text(ax, lift_dir(1)*L*scale, lift_dir(2)*L*scale, ' Total Lift', 'Color', [0 0.6 0]);
+    % Thrust 2 Vector (oriented at phi2 relative to horizontal)
+    dir_T2 = [cos(phi2), sin(phi2)];
+    quiver(ax, pos_tail(1), pos_tail(2), dir_T2(1)*T2*scale, dir_T2(2)*T2*scale, 'LineWidth', 2, 'Color', [0.6 0 0.6]);
 
-    title(ax, sprintf('Interactive Aerodynamic State: V = %.1f m/s', V));
-    xlim(ax, [-2.2, 2.2]);
-    ylim(ax, [-2.2, 2.2]);
-    axis(ax, 'on');
+    % Nacelle 2 Structural Drag (acts at alpha_nac2 relative to local tail vector)
+    dir_D_nac2 = -[cos(alpha_nac2), sin(alpha_nac2)];
+    quiver(ax, pos_tail(1), pos_tail(2), dir_D_nac2(1)*D_nac2*scale, dir_D_nac2(2)*D_nac2*scale, 'LineWidth', 1.5, 'Color', [0.8 0.5 0.1]);
+
+    %% 5. DIAGNOSTIC INTERACTION ANGLE ARCS & LABELS
+    angle_scale = 0.5;
+    plot(ax, [pos_CG(1), pos_CG(1)+2.0], [pos_CG(2), pos_CG(2)], 'k:', 'LineWidth', 0.8); % Horizon indicator line
+
+    DrawLocalArc(ax, pos_CG(1), pos_CG(2), 0, gamma, angle_scale, 'b', '\gamma');
+    DrawLocalArc(ax, pos_CG(1), pos_CG(2), gamma, alpha, angle_scale*0.8, 'r', '\alpha');
+    DrawLocalArc(ax, pos_wing(1), pos_wing(2), alpha, epsilon1, angle_scale*0.6, 'm', '\epsilon_1');
+    DrawLocalArc(ax, pos_tail(1), pos_tail(2), alpha, epsilon2, angle_scale*0.6, [0.6 0 0.6], '\epsilon_2');
+
+    % Text callouts for identification
+    text(ax, pos_wing(1), pos_wing(2)+0.15, 'Wing', 'FontSize', 8, 'FontWeight', 'bold');
+    text(ax, pos_tail(1), pos_tail(2)+0.15, 'Tail', 'FontSize', 8, 'FontWeight', 'bold');
+
+    title(ax, sprintf('Generalized Aircraft Force Distribution Profile | V = %.1f m/s', V));
+    xlim(ax, [-2.5, 2.5]);
+    ylim(ax, [-2.5, 2.5]);
     grid(ax, 'on');
+    box(ax, 'on');
 end
 
-function DrawLocalArc(ax, start_ang, delta_ang, radius, color, label)
-    theta = linspace(start_ang, start_ang + delta_ang, 50);
-    [x, y] = pol2cart(theta, radius);
-    plot(ax, x, y, 'Color', color, 'LineWidth', 1.5);
-    [tx, ty] = pol2cart(start_ang + delta_ang/2, radius*1.2);
-    text(ax, tx, ty, label, 'Color', color, 'FontSize', 11, 'FontWeight', 'bold');
+function DrawLocalArc(ax, ox, oy, start_ang, delta_ang, radius, color, label)
+    theta = linspace(start_ang, start_ang + delta_ang, 40);
+    x = ox + radius * cos(theta);
+    y = oy + radius * sin(theta);
+    plot(ax, x, y, 'Color', color, 'LineWidth', 1.2);
+
+    tx = ox + radius * 1.25 * cos(start_ang + delta_ang/2);
+    ty = oy + radius * 1.25 * sin(start_ang + delta_ang/2);
+    text(ax, tx, ty, label, 'Color', color, 'FontSize', 10, 'FontWeight', 'bold');
 end

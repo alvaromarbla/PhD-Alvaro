@@ -1,47 +1,47 @@
-function generate_results_page(results, models)
+function generate_results_page_1Wing(results, models)
     % Create a single master results figure window
     figure('Name', 'Patronus Performance Results Page', 'Position', [100, 100, 1200, 900]);
 
-    %% ==============================================
+    %% ====================================================
     %% SUBPLOT 1: CP Contour Map
-    %% ==============================================
+    %% ====================================================
     ax1 = subplot(3, 2, 1);
     plot_cp_contour(ax1, results, models);
 
-    %% ==============================================
+    %% ====================================================
     %% SUBPLOT 2: CT Contour Map
-    %% ==============================================
+    %% ====================================================
     ax2 = subplot(3, 2, 2);
     plot_ct_contour(ax2, results, models);
 
-    %% ==============================================
+    %% ====================================================
     %% SUBPLOT 3: Aerodynamic Curves (CL vs Alpha)
-    %% ==============================================
+    %% ====================================================
     ax3 = subplot(3, 2, 3);
     plot_CL(ax3, results, models);
 
-    %% ==============================================
+    %% ====================================================
     %% SUBPLOT 4: Aerodynamic Curves (CL vs Alpha)
-    %% ==============================================
+    %% ====================================================
     ax4 = subplot(3, 2, 4);
     plot_CD(ax4, results, models);
 
-    %% ==============================================
+    %% ====================================================
     %% SUBPLOT 5: Aerodynamic Curves (CL vs Alpha)
-    %% ==============================================
+    %% ====================================================
     ax5 = subplot(3, 2, 5);
     plot_AeroEff(ax5, results, models);
 
-    %% ==============================================
+    %% ====================================================
     %% SUBPLOT 4: CD for Nacelle
-    %% ==============================================
+    %% ====================================================
 
     ax6 = subplot(3, 2, 6);
     plot_CD_nac(ax6, results, models);
 
-    %% ==============================================
+    %% ====================================================
     %% PLOT 5: Forces and Angles Diagram
-    %% ==============================================
+    %% ====================================================
 
     figure('Name', 'Patronus Forces Results Page', 'Position', [100, 100, 1200, 900]);
 
@@ -49,18 +49,18 @@ function generate_results_page(results, models)
     plotforceangles(axForce, results);
     %plotforcesangles_imag(axForce, results);
 
-    %% ==============================================
+    %% ====================================================
     %% PLOT 6: Speed triangle of nacelle
-    %% ==============================================
+    %% ====================================================
     figure('Name', 'Patronus Speed Triangle Results Page', 'Position', [100, 100, 1200, 900]);
 
     axTriangle = axes();
     plotspeedtriangle_nac(axTriangle, results);
 end
 
-%% ============================================================
+%% ================================================================
 %% HELPER FUNCTIONS (Appended at the bottom of the same file)
-%% ============================================================
+%% ================================================================
 
 function plot_cp_contour(ax, results, models)
     % Extract parameters
@@ -129,7 +129,7 @@ end
 
 function plot_CL(ax, results, models)
     % Extract current optimal points
-    alpha_opt = results.alpha_opt; % Assuming in radians
+    alpha_opt = results.opt.alpha; % Assuming in radians
     CL_opt = results.CL_opt;       % Optimal CL
     % Vector for full curve generation
     alpha_vec = linspace(-pi/2, pi/2, 50);
@@ -154,7 +154,7 @@ end
 
 function plot_CD(ax, results, models)
     % Extract current optimal points
-    alpha_opt = results.alpha_opt; % Assuming in radians
+    alpha_opt = results.opt.alpha; % Assuming in radians
     CD_opt = results.CD_opt;
     % Vector for full curve generation
     alpha_vec = linspace(-pi/2, pi/2, 50);
@@ -180,7 +180,7 @@ end
 
 function plot_AeroEff(ax, results, models)
     % Extract current optimal points
-    alpha_opt = results.alpha_opt; % Assuming in radians
+    alpha_opt = results.opt.alpha; % Assuming in radians
     CL_opt = results.CL_opt;
     CD_opt = results.CD_opt;
     % Vector for full curve generation
@@ -229,16 +229,15 @@ function plot_CD_nac(ax, results, models)
     ylabel(ax, '$C_D$ Nacelle [-]', 'Interpreter', 'latex');
     title(ax, 'Aerodynamic Sweep: $C_D$ Nacelle vs. $\alpha$', 'Interpreter', 'latex');
     legend(ax, 'Model Curve', 'Optimal Point', 'Location', 'North');
-
 end
 
 function plotspeedtriangle_nac(ax, results)
 
     % Extract parameters
-    V_inf = results.V_opt;       % Freestream velocity magnitude
-    v_i   = results.vi;          % Induced velocity magnitude
-    V_nac = results.V_nac;       % Total nacelle velocity magnitude
-    phi   = results.phi_opt;     % Engine tilt angle (rad)
+    V_inf = results.opt.V;         % Freestream velocity magnitude
+    v_i    = results.vi;           % Induced velocity magnitude
+    V_nac = results.V_nac;         % Total nacelle velocity magnitude
+    phi   = results.phi_opt;       % Engine tilt angle (rad)
     %alpha_nac = results.alpha_nac;   % Vehicle angle of attack (rad)
 
     %% 1. Define Vector Components (Wind Axis System)

@@ -1,9 +1,9 @@
 function plotforceangles(ax, results)
     % Extract parameters
-    V = results.V_opt;
-    gamma = results.gamma_opt;
-    alpha = results.alpha_opt;
-    epsilon = results.epsilon_opt;
+    V = results.opt.V;
+    gamma = results.opt.gamma;
+    alpha = results.opt.alpha;
+    epsilon = results.opt.epsilon;
     alpha_nac = results.alpha_nac;
 
     L = results.L_opt;
