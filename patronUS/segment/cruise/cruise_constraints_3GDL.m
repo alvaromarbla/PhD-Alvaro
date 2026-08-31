@@ -60,11 +60,15 @@ D_tailwing = CD_tailwing*q* params.tailwing_area;
 %% Prop forces calculation
 T1 =  params.prop.num_engines * CT1 * params.rho * (n1^2) * (params.prop.diameter^4);
 H1 =  params.prop.num_engines * CH1 * params.rho * (n1^2) * (params.prop.diameter^4);
-P1 =  params.prop.num_engines * CP1 * params.rho * (n1^3) * (params.prop.diameter^5);
+%P1 =  params.prop.num_engines * CP1 * params.rho * (n1^3) * (params.prop.diameter^5);
+P1 =  T1*V; %%%% CHANGE THIS
 
 T2 =  params.prop.num_engines * CT2 * params.rho * (n2^2) * (params.prop.diameter^4);
 H2 =  params.prop.num_engines * CH2 * params.rho * (n2^2) * (params.prop.diameter^4);
-P2 =  params.prop.num_engines * CP2 * params.rho * (n2^3) * (params.prop.diameter^5);
+%P2 =  params.prop.num_engines * CP2 * params.rho * (n2^3) * (params.prop.diameter^5);P1 =  T1*V;
+P2 =  T2*V; %%%% CHANGE THIS
+
+
 
 %% Nacelle drag Calculation
 

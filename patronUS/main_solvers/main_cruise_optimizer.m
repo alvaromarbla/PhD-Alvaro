@@ -26,16 +26,20 @@ versions.Batt_version = ' '; % Battery model to use
 
 % Versions for constraints
 % To choose among: 1Wing, 1Wing_Nacelle, 2Wings
-versions.constraints = "1Wing_Nacelle";
+versions.constraints = "2Wings";
 
 % Versions for constraints
 % To choose among: "max_range_1W", "max_range_2W"
-versions.objective = "max_range_1W";
+versions.objective = "max_range_2W";
 
 %% Import Casadi and optimizer
 
 import casadi.*
 opti = Opti();
+
+%% Initialize configuration & Generate Models
+
+[params, bounds, models] = cruise_config(versions);
 
 %% Load Registry and Configuration
 
@@ -46,13 +50,8 @@ validate_config(versions,registry);
 constraint_fcn = registry.constraints(char(versions.constraints));
 objective_fcn  = registry.objective(char(versions.objective));
 
-%% Initialize configuration
 
-[params, bounds] = cruise_config(versions.AC_version);
 
-%% Generate model lookups
-
-models = models_config(versions);
 
 %% Define Decision Variables
 

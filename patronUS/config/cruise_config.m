@@ -1,8 +1,11 @@
-function [params, bounds] = cruise_config(AC_version)
+function [params, bounds,models] = cruise_config(versions)
 
 import casadi.*
 
-if AC_version == "1Wing"
+models = models_config(versions);
+
+
+if versions.AC_version == "1Wing"
     mass_batt= 3;                                  % [kg]
     E_batt = 720e3*mass_batt;
 
@@ -34,7 +37,7 @@ if AC_version == "1Wing"
     bounds.vars.epsilon = struct('min', deg2rad(0),   'max', deg2rad(90),            'init', deg2rad(60));
     bounds.vars.n       = struct('min', 25,                 'max', params.prop.max_rps, 'init', 25.214);
 
-elseif AC_version == "2Wings"
+elseif versions.AC_version == "2Wings"
 
     mass_batt= 3;                                  % [kg]
     E_batt = 720e3*mass_batt;
@@ -86,8 +89,8 @@ elseif AC_version == "2Wings"
     bounds.vars.q        = struct('min', -0.6,             'max', 0.6,                    'init', 0); % Rad/s
 
     % Controls
-    bounds.vars.n1   = struct('min', 20,   'max', params.prop.max_rps, 'init', 25.0);
-    bounds.vars.n2   = struct('min', 20,   'max', params.prop.max_rps, 'init', 25.0);
+    bounds.vars.n1   = struct('min', 18,   'max', params.prop.max_rps, 'init', 25.0);
+    bounds.vars.n2   = struct('min', 18,   'max', params.prop.max_rps, 'init', 25.0);
     % bounds.vars.tau1 = struct('min', -5,   'max', 5,                   'init', 0.0);
     % bounds.vars.tau2 = struct('min', -5,   'max', 5,                   'init', 0.0);
     bounds.vars.deltae = struct('min', deg2rad(-20), 'max', deg2rad(20),                  'init', 0);
