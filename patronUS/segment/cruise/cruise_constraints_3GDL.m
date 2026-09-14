@@ -1,13 +1,13 @@
-function [c, ceq, diag] = cruise_constraints_3GDL(X_struct, models, params, bounds)
+function [c, ceq, dbg] = cruise_constraints_3GDL(X_struct, models, params, bounds)
 % Steady State constraints
 
-V       = X_struct.V;
-gamma   = X_struct.gamma; % Steady cruise implies gamma = 0, which is handled via bounds or optimization rules
-theta   = X_struct.theta;
+V        = X_struct.V;
+gamma    = X_struct.gamma; % Steady cruise implies gamma = 0, which is handled via bounds or optimization rules
+theta    = X_struct.theta;
 epsilon1 = X_struct.epsilon1;
 epsilon2 = X_struct.epsilon2;
-n1      = X_struct.n1;
-n2      = X_struct.n2;
+n1       = X_struct.n1;
+n2       = X_struct.n2;
 % tau1     = x(8);
 % tau2     = x(9);
 delta_e = X_struct.deltae;
@@ -42,7 +42,7 @@ CM_fus = models.CM_fuselage_lookup(alpha);
 
 CL_tailwing = models.CL_tail_lookup(alpha-xi_dw); %, delta_e)
 CD_tailwing = models.CD_tail_lookup(alpha-xi_dw); %, delta_e)
-CM_tailwing = models.CM_tail_lookup(alpha); %, delta_e)
+CM_tailwing = models.CM_tail_lookup(alpha-xi_dw); %, delta_e)
 
 %% Force calculations
 
@@ -60,15 +60,13 @@ D_tailwing = CD_tailwing*q* params.tailwing_area;
 %% Prop forces calculation
 T1 =  params.prop.num_engines * CT1 * params.rho * (n1^2) * (params.prop.diameter^4);
 H1 =  params.prop.num_engines * CH1 * params.rho * (n1^2) * (params.prop.diameter^4);
-%P1 =  params.prop.num_engines * CP1 * params.rho * (n1^3) * (params.prop.diameter^5);
-P1 =  T1*V; %%%% CHANGE THIS
+P1 =  params.prop.num_engines * CP1 * params.rho * (n1^3) * (params.prop.diameter^5);
+%P1 =  T1*V; %%%% CHANGE THIS
 
 T2 =  params.prop.num_engines * CT2 * params.rho * (n2^2) * (params.prop.diameter^4);
 H2 =  params.prop.num_engines * CH2 * params.rho * (n2^2) * (params.prop.diameter^4);
-%P2 =  params.prop.num_engines * CP2 * params.rho * (n2^3) * (params.prop.diameter^5);P1 =  T1*V;
-P2 =  T2*V; %%%% CHANGE THIS
-
-
+P2 =  params.prop.num_engines * CP2 * params.rho * (n2^3) * (params.prop.diameter^5);
+%P2 =  T2*V; %%%% CHANGE THIS
 
 %% Nacelle drag Calculation
 
@@ -89,8 +87,8 @@ end
 alpha_nac1 = atan(sin(phi1)/(lambda_i1 + cos(phi1)));
 CD_nac1 = models.CD_nac_lookup(alpha_nac1);
 
-
 V1_nac2 = V^2 + (lambda_i1*V)^2 + 2*cos(phi1)*lambda_i1*V^2;
+vi1 = lambda_i1*V;
 q_nac1 = 0.5 * params.rho * (V1_nac2) ;
 
 D_nac1 = CD_nac1*q_nac1* params.prop.nacelle_area*params.prop.num_engines; % Area accounts for ONE engine
@@ -112,8 +110,8 @@ end
 alpha_nac2 = atan(sin(phi2)/(lambda_i2 + cos(phi2)));
 CD_nac2 = models.CD_nac_lookup(alpha_nac2);
 
-
 V2_nac2 = V^2 + (lambda_i2*V)^2 + 2*cos(phi2)*lambda_i2*V^2;
+vi2 = lambda_i2*V;
 q_nac2 = 0.5 * params.rho * (V2_nac2) ;
 
 D_nac2 = CD_nac2*q_nac2* params.prop.nacelle_area*params.prop.num_engines; % Area accounts for ONE engine
@@ -165,8 +163,8 @@ M_Nac2 = -D_nac2*sin(epsilon2-alpha_nac2)*params.geo.xtw + D_nac2*cos(epsilon2-a
 ceq = [  T1*cos(phi1) + T2*cos(phi2) - H1*sin(phi1)- H2*sin(phi2)-D_Tot; % Long forces (m*vdot = ...)
          T1*sin(phi1) + T2*sin(phi2) + H1*cos(phi1)+ H2*cos(phi2)+L_Tot-params.mass*params.g; % Trans forces (m*V*gammadot = ...)
          MA + M_Wing + M_Fus + M_Tail+  M_Nac1 + M_Nac2 + M_Eng1 + M_Eng2; % Moments (qdot* Iyy = ...)
-          % force gamma = 0
-    ];
+         % force gamma = 0
+       ];
 
 %tau1 = Inertia_nac1*epsilon1dotdot; % Reaction torque for Nac 1
 %tau2 = Inertia_nac2*epsilon2dotdot; % Reaction torque for Nac 2
@@ -174,33 +172,52 @@ ceq = [  T1*cos(phi1) + T2*cos(phi2) - H1*sin(phi1)- H2*sin(phi2)-D_Tot; % Long 
 % Inequalities
 
 c = [-V/(n1*params.prop.diameter)  ; ...
-    -V/(n2*params.prop.diameter);...
-    -CT1;...
-    -CT2;...
-    -CP1;  ...
-    -CP2;  ...
-    T1 - params.prop.T_max_eng*params.prop.num_engines;
-    T2 - params.prop.T_max_eng*params.prop.num_engines; ...
-    P1 - params.prop.P_max_eng*params.prop.num_engines;...
-    P2 - params.prop.P_max_eng*params.prop.num_engines;...
-    J1-1.2;...
-    J2-1.2];
+     -V/(n2*params.prop.diameter);...
+     -CT1;...
+     -CT2;...
+     -CP1;   ...
+     -CP2;   ...
+     T1 - params.prop.T_max_eng*params.prop.num_engines;
+     T2 - params.prop.T_max_eng*params.prop.num_engines; ...
+     P1 - params.prop.P_max_eng*params.prop.num_engines;...
+     P2 - params.prop.P_max_eng*params.prop.num_engines;...
+     J1-1.2;...
+     J2-1.2];
 
 if nargout > 2
-    diag.alpha = alpha;       diag.phi1 = phi1;      diag.phi2 = phi2;
-    diag.n1 = n1;             diag.n2 = n2;
-    diag.T1 = T1;             diag.T2 = T2;
-    diag.H1 = H1;             diag.H2 = H2;
-    diag.D_wing = D_wing;     diag.D_fus = D_fus;    diag.D_tailwing = D_tailwing;
-    diag.D_nac1 = D_nac1;     diag.D_nac2 = D_nac2;  diag.D_Tot = D_Tot;
-    diag.L_wing = L_wing;     diag.L_fus = L_fus;    diag.L_tailwing = L_tailwing;
-    diag.L_Tot = L_Tot;
-    diag.MA_wing = MA_wing;   diag.MA_fus = MA_fus;  diag.MA_tail = MA_tail;
-    diag.M_Wing = M_Wing;     diag.M_Fus = M_Fus;    diag.M_Tail = M_Tail;
-    diag.M_Eng1 = M_Eng1;     diag.M_Eng2 = M_Eng2;
-    diag.M_Nac1 = M_Nac1;     diag.M_Nac2 = M_Nac2;
-    diag.weight = params.mass*params.g;
-    diag.ceq = ceq;
-end
+    dbg.alpha = alpha;         dbg.phi1 = phi1;        dbg.phi2 = phi2;
+    dbg.xi_dw = xi_dw;
+    dbg.J1    = J1;            dbg.J2 = J2;
+    dbg.n1 = n1;                dbg.n2 = n2;
+    dbg.CT1 = CT1;              dbg.CT2 = CT2;
+    dbg.CP1 = CP1;              dbg.CP2 = CP2;
+    dbg.CH1 = CH1;              dbg.CH2 = CH2;
+    dbg.T1 = T1;                dbg.T2 = T2;
+    dbg.P1 = P1;                dbg.P2 = P2;
+    dbg.H1 = H1;                dbg.H2 = H2;
 
+    dbg.CL_wing = CL_wing; dbg.CD_wing = CD_wing; dbg.CM_wing = CM_wing;
+    dbg.CL_tail = CL_tailwing; dbg.CD_tail = CD_tailwing; dbg.CM_tail = CM_tailwing;
+    dbg.CL_fuselage = CL_fus; dbg.CD_fuselage = CD_fus; dbg.CM_fuselage = CM_fus;
+
+    dbg.D_wing = D_wing;        dbg.D_fuselage = D_fus;      dbg.D_tail = D_tailwing;
+    dbg.D_nac1 = D_nac1;        dbg.D_nac2 = D_nac2;   dbg.D_Tot = D_Tot;
+    dbg.L_wing = L_wing;        dbg.L_fuselage = L_fus;       dbg.L_tail = L_tailwing;
+    dbg.alpha_nac1 = alpha_nac1;   dbg.alpha_nac2 = alpha_nac2;
+    dbg.lambda_i1 = lambda_i1;     dbg.lambda_i2 = lambda_i2;
+    dbg.vi1 = vi1;                              dbg.vi2 = vi2;
+    dbg.CD_nac1 = CD_nac1;           dbg.CD_nac2 = CD_nac2;
+    dbg.D_nac1 = D_nac1;             dbg.D_nac2 = D_nac2;
+    dbg.V1_nac2  = V1_nac2;          dbg.V2_nac2  = V2_nac2;
+    dbg.L_tailwing_wind = L_tailwing_wind; dbg.D_tailwing_wind = D_tailwing_wind;
+    dbg.L_Tot = L_Tot;
+
+    dbg.MA_wing = MA_wing;   dbg.MA_fuselage = MA_fus;   dbg.MA_tail = MA_tail;
+    dbg.MA = MA_wing + MA_fus + MA_tail;
+    dbg.M_Wing = M_Wing;        dbg.M_Fus = M_Fus;     dbg.M_Tail = M_Tail;
+    dbg.M_Eng1 = M_Eng1;        dbg.M_Eng2 = M_Eng2;
+    dbg.M_Nac1 = M_Nac1;        dbg.M_Nac2 = M_Nac2;
+    dbg.weight = params.mass*params.g;
+    dbg.ceq = ceq;
+end
 end

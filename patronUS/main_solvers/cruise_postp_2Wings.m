@@ -7,10 +7,10 @@ end
 
 % 2. Calculate the optimized J and phi coordinates
 results.J1   = results.opt.V / (results.opt.n1 * params.prop.diameter);
-results.phi1 = results.opt.alpha + results.opt.epsilon1;
+results.phi1 = results.alpha + results.opt.epsilon1;
 
 results.J2   = results.opt.V / (results.opt.n2 * params.prop.diameter);
-results.phi2 = results.opt.alpha + results.opt.epsilon2;
+results.phi2 = results.alpha + results.opt.epsilon2;
 
 % 3. Evaluate models numerically using full()
 
@@ -22,19 +22,19 @@ results.CT2 = full(models.CT_lookup(results.J2,results.phi2));
 results.CP2 = full(models.CP_lookup(results.J2,results.phi2));
 results.CH2 = full(models.CH_lookup(results.J2,results.phi2));
 
-results.xi_dw =  full (downwash_calc(results.opt.alpha));
+results.xi_dw =  full (downwash_calc(results.alpha));
 
-results.CL_wing = full(models.CL_wing_lookup(results.opt.alpha));
-results.CD_wing = full(models.CD_wing_lookup(results.opt.alpha));
-results.CM_wing = full(models.CM_wing_lookup(results.opt.alpha));
+results.CL_wing = full(models.CL_wing_lookup(results.alpha));
+results.CD_wing = full(models.CD_wing_lookup(results.alpha));
+results.CM_wing = full(models.CM_wing_lookup(results.alpha));
 
-results.CL_tail = full(models.CL_tail_lookup(results.opt.alpha - results.xi_dw));
-results.CD_tail = full(models.CD_tail_lookup(results.opt.alpha - results.xi_dw));
-results.CM_tail = full(models.CM_tail_lookup(results.opt.alpha - results.xi_dw));
+results.CL_tail = full(models.CL_tail_lookup(results.alpha - results.xi_dw));
+results.CD_tail = full(models.CD_tail_lookup(results.alpha - results.xi_dw));
+results.CM_tail = full(models.CM_tail_lookup(results.alpha - results.xi_dw));
 
-results.CL_fuselage = full(models.CL_fuselage_lookup(results.opt.alpha));
-results.CD_fuselage = full(models.CD_fuselage_lookup(results.opt.alpha));
-results.CM_fuselage = full(models.CM_fuselage_lookup(results.opt.alpha));
+results.CL_fuselage = full(models.CL_fuselage_lookup(results.alpha));
+results.CD_fuselage = full(models.CD_fuselage_lookup(results.alpha));
+results.CM_fuselage = full(models.CM_fuselage_lookup(results.alpha));
 
 
 % Evaluate result
@@ -135,14 +135,14 @@ results.MA = results.MA_wing + results.MA_fus + results.MA_tail;
 % Inertia_nac1 = params.I_yy1 *epsilon1dotdot;
 % Inertia_nac2 = params.I_yy2 *epsilon2dotdot;
 
-results.M_Fus = results.L_fuselage*cos(results.opt.alpha)*params.geo.xfus - results.L_fuselage*sin(results.opt.alpha)*params.geo.zfus...
-    +results.D_fuselage*sin(results.opt.alpha)*params.geo.xfus - results.D_fuselage*cos(results.opt.alpha)*params.geo.zfus; % Fuselage contribution
+results.M_Fus = results.L_fuselage*cos(results.alpha)*params.geo.xfus - results.L_fuselage*sin(results.alpha)*params.geo.zfus...
+    +results.D_fuselage*sin(results.alpha)*params.geo.xfus - results.D_fuselage*cos(results.alpha)*params.geo.zfus; % Fuselage contribution
 
-results.M_Wing = results.L_wing* cos(results.opt.alpha)*params.geo.xw -results.L_wing*sin(results.opt.alpha)*params.geo.zw...
-    +results.D_wing*sin(results.opt.alpha)*params.geo.xw + results.D_wing*cos(results.opt.alpha)*params.geo.zw; % Wing contribution
+results.M_Wing = results.L_wing* cos(results.alpha)*params.geo.xw -results.L_wing*sin(results.alpha)*params.geo.zw...
+    +results.D_wing*sin(results.alpha)*params.geo.xw + results.D_wing*cos(results.alpha)*params.geo.zw; % Wing contribution
 
-results.M_Tail = - results.L_tailwing_wind*cos(results.opt.alpha)*params.geo.xtw - results.L_tailwing_wind*sin(results.opt.alpha)*params.geo.ztw...
-    -results.D_tailwing_wind*sin(results.opt.alpha)*params.geo.xtw + results.D_tailwing_wind*cos(results.opt.alpha)*params.geo.ztw; % Tail wing contribution
+results.M_Tail = - results.L_tailwing_wind*cos(results.alpha)*params.geo.xtw - results.L_tailwing_wind*sin(results.alpha)*params.geo.ztw...
+    -results.D_tailwing_wind*sin(results.alpha)*params.geo.xtw + results.D_tailwing_wind*cos(results.alpha)*params.geo.ztw; % Tail wing contribution
 
 results.M_Eng1 = results.T1*sin(results.opt.epsilon1)*params.geo.xtw - results.T1*cos(results.opt.epsilon1)*params.geo.ztw ...
     + results.H1*cos(results.opt.epsilon1)*params.geo.xtw + results.H1*sin(results.opt.epsilon1)*params.geo.ztw;

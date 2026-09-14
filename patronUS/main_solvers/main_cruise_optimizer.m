@@ -13,9 +13,9 @@ close all
 %% User version input
 
 versions.AC_version    = "2Wings"; % Aicraft Version: 1Wing, 2Wings
-versions.CL_version    = 'dummy'; % CL model to use ("analytical, dummy")
-versions.CD_version    = 'dummy'; % CD model to use ("analytical, dummy")
-versions.CM_version    = 'dummy'; % CM model to use ("analytical, dummy")
+versions.CL_version    = 'analytical'; % CL model to use ("analytical, dummy")
+versions.CD_version    = 'analytical'; % CD model to use ("analytical, dummy")
+versions.CM_version    = 'analytical'; % CM model to use ("analytical, dummy")
 
 
 versions.CT_version    = 'analytical'; % CT model to use
@@ -87,47 +87,9 @@ opti.minimize(obj_fun);
 
 %% Call Constraints
 
-[c, ceq] = constraint_fcn(X_struct, models, params, bounds); % Can have diag as output ( or not)
+[c, ceq,dbg] = constraint_fcn(X_struct, models, params, bounds); % Can have diag as output ( or not)
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EVALUATE INITIAL ( TRIM ) POINT %%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-if exist('diag', 'var')
-    diag_names = fieldnames(diag);
-    diag0 = struct();
-
-    % Package your variables and their numbers into an assignment list
-    % This maps your symbols to your numerical vector for substitution
-    assignment_list = {opti.x, vars0};
-
-    for k = 1:numel(diag_names)
-        % Evaluate by substituting opti.x values with vars0 values
-        diag0.(diag_names{k}) = full(opti.value(diag.(diag_names{k}), assignment_list));
-    end
-    % --- Your print statements remain completely untouched below ---
-    fprintf('alpha = %.3f deg | phi1 = %.3f deg | phi2 = %.3f deg\n', ...
-        rad2deg(diag0.alpha), rad2deg(diag0.phi1), rad2deg(diag0.phi2));
-    fprintf('n1 = %.3f rps | n2 = %.3f rps\n', ...
-        diag0.n1, diag0.n2);
-
-    fprintf('\n--- FORCE BREAKDOWN [N] ---\n');
-    fprintf('T1 = %10.2f   T2 = %10.2f   H1 = %10.2f  H2 = %10.2f\n', diag0.T1, diag0.T2, diag0.H1, diag0.H2);
-    fprintf('D_wing = %8.2f  D_fus = %8.2f  D_tail = %8.2f  D_nac1 = %8.2f  D_nac2 = %8.2f  D_Tot = %8.2f\n', ...
-        diag0.D_wing, diag0.D_fus, diag0.D_tailwing, diag0.D_nac1, diag0.D_nac2, diag0.D_Tot);
-    fprintf('L_wing = %8.2f  L_fus = %8.2f  L_tail = %8.2f  L_Tot = %8.2f  Weight = %8.2f\n', ...
-        diag0.L_wing, diag0.L_fus, diag0.L_tailwing, diag0.L_Tot, diag0.weight);
-
-    fprintf('\n--- MOMENT BREAKDOWN [N*m] ---\n');
-    fprintf('MA_wing = %8.2f  MA_fus = %8.2f  MA_tail = %8.2f\n', diag0.MA_wing, diag0.MA_fus, diag0.MA_tail);
-    fprintf('M_Wing = %8.2f  M_Fus = %8.2f  M_Tail = %8.2f\n', diag0.M_Wing, diag0.M_Fus, diag0.M_Tail);
-    fprintf('M_Eng1 = %8.2f  M_Eng2 = %8.2f  M_Nac1 = %8.2f  M_Nac2 = %8.2f\n', ...
-        diag0.M_Eng1, diag0.M_Eng2, diag0.M_Nac1, diag0.M_Nac2);
-
-    fprintf('\n--- CEQ RESIDUALS ---\n');
-    fprintf('Long force (should be 0): %10.3f N\n', diag0.ceq(1));
-    fprintf('Trans force (should be 0): %10.3f N\n', diag0.ceq(2));
-    fprintf('Moment (should be 0):     %10.3f N*m\n', diag0.ceq(3));
-end
 
 g_all = [c; ceq];   % keep this handle
 n_ineq = numel(c);
@@ -177,7 +139,11 @@ if solve_ok
     generate_results_page_1Wing(results, models)
 
     elseif  versions.AC_version == "2Wings"
-    [results, checks, aux] = cruise_postp_2Wings(sol_obj, X_struct, models, params, fval,versions);
+    if exist('dbg','var')
+        [results] = cruise_postp_2Wings_dbg(sol_obj,X_struct,dbg,params,fval);
+    else
+        [results, checks, aux] = cruise_postp_2Wings(sol_obj, X_struct, models, params, fval,versions);
+    end
     generate_results_page_2Wings(results, models,params)
     end
 else

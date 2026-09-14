@@ -1,13 +1,13 @@
 function generate_results_page_2Wings(results, models,params)
     % Create a series of master figures
-    figure('Name', 'Patronus Performance Propulsion Results Page', 'Position', [100, 100, 1200, 900]);
+    propFig = figure('Name', 'Patronus Performance Propulsion Results Page', 'Position', [100, 100, 1200, 900]);
 
     J_opt1 = results.J1;
     phi_opt1 =  results.phi1;
     J_opt2 = results.J2;
     phi_opt2 =  results.phi2;
 
-    alpha_opt = results.opt.alpha;
+    alpha_opt = results.alpha;
     xi_dw     = results.xi_dw;
 
     CL_wing_opt = results.CL_wing;
@@ -70,8 +70,20 @@ function generate_results_page_2Wings(results, models,params)
     ax6 = subplot(3, 2, 6);
     plot_ch_contour(ax6, J_opt2,phi_opt2, models);
 
-    figure('Name', 'Patronus Performance Aero Wing Results Page', 'Position', [100, 100, 1200, 900]);
+    
+    picturewidth = 20;
+    hw_ratio = 0.65;
+    set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegendInterpreter','latex')
+    set(findall(propFig,'-property','FontSize'),'FontSize',16)
+    set(findall(propFig,'-property','Box'),'Box','off') % optional
+    set(findall(propFig,'-property','Interpreter'),'Interpreter','latex')
+    set(findall(propFig,'-property','TickLabelInterpreter'),'TickLabelInterpreter','latex')
+    set(propFig,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
+    pos = get(propFig,'Position');
+    set(propFig,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
+    print(propFig,'Prop_Maps','-dpdf','-vector','-fillpage')
 
+    aeroFigWing = figure('Name', 'Patronus Performance Aero Wing Results Page', 'Position', [100, 100, 1200, 900]);
     %% ====================================================
     %% SUBPLOT 1: Aerodynamic Curves (CL vs Alpha)
     %% ====================================================
@@ -96,7 +108,19 @@ function generate_results_page_2Wings(results, models,params)
     ax4 = subplot(2, 2, 4);
     plot_AeroEff_wing(ax4, alpha_opt, CL_wing_opt, CD_wing_opt, models);
 
-    figure('Name', 'Patronus Performance Aero Fuselage Results Page', 'Position', [100, 100, 1200, 900]);
+    picturewidth = 20;
+    hw_ratio = 0.65;
+    set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegendInterpreter','latex')
+    set(findall(aeroFigWing,'-property','FontSize'),'FontSize',16)
+    set(findall(aeroFigWing,'-property','Box'),'Box','off') % optional
+    set(findall(aeroFigWing,'-property','Interpreter'),'Interpreter','latex')
+    set(findall(aeroFigWing,'-property','TickLabelInterpreter'),'TickLabelInterpreter','latex')
+    set(aeroFigWing,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
+    pos = get(aeroFigWing,'Position');
+    set(aeroFigWing,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
+    print(aeroFigWing,'Aero_Curves_Wing','-dpdf','-vector','-fillpage')
+
+    aeroFigFus = figure('Name', 'Patronus Performance Aero Fuselage Results Page', 'Position', [100, 100, 1200, 900]);
 
     %% ====================================================
     %% SUBPLOT 1: Aerodynamic Curves (CL vs Alpha)
@@ -122,7 +146,20 @@ function generate_results_page_2Wings(results, models,params)
     ax4 = subplot(2, 2, 4);
     plot_AeroEff_fuselage(ax4, alpha_opt, CL_fuselage_opt, CD_fuselage_opt, models);
 
-    figure('Name', 'Patronus Performance Aero Tail Results Page', 'Position', [100, 100, 1200, 900]);
+    picturewidth = 20;
+    hw_ratio = 0.65;
+    set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegendInterpreter','latex')
+    set(findall(aeroFigFus,'-property','FontSize'),'FontSize',16)
+    set(findall(aeroFigFus,'-property','Box'),'Box','off') % optional
+    set(findall(aeroFigFus,'-property','Interpreter'),'Interpreter','latex')
+    set(findall(aeroFigFus,'-property','TickLabelInterpreter'),'TickLabelInterpreter','latex')
+    set(aeroFigFus,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
+    pos = get(aeroFigFus,'Position');
+    set(aeroFigFus,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
+    print(aeroFigFus,'Aero_Curves_Fus','-dpdf','-vector','-fillpage')
+
+
+    aeroFigureTail = figure('Name', 'Patronus Performance Aero Tail Results Page', 'Position', [100, 100, 1200, 900]);
 
     %% ====================================================
     %% SUBPLOT 1: Aerodynamic Curves (CL vs Alpha)
@@ -148,11 +185,22 @@ function generate_results_page_2Wings(results, models,params)
     ax4 = subplot(2, 2, 4);
     plot_AeroEff_tail(ax4,  alpha_opt-xi_dw, CL_tail_opt, CD_tail_opt, models);
 
+    picturewidth = 20;
+    hw_ratio = 0.65;
+    set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegendInterpreter','latex')
+    set(findall(aeroFigureTail,'-property','FontSize'),'FontSize',16)
+    set(findall(aeroFigureTail,'-property','Box'),'Box','off') % optional
+    set(findall(aeroFigureTail,'-property','Interpreter'),'Interpreter','latex')
+    set(findall(aeroFigureTail,'-property','TickLabelInterpreter'),'TickLabelInterpreter','latex')
+    set(aeroFigureTail,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
+    pos = get(aeroFigureTail,'Position');
+    set(aeroFigureTail,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
+    print(aeroFigureTail,'Aero_Curves_Tail','-dpdf','-vector','-fillpage')    
 
     %% ====================================================
     %% PLOT 5: Nacelle speed triangles and drag
     %% ====================================================
-    figure('Name', 'Patronus Nacelles Results Page', 'Position', [100, 100, 1200, 900]);
+    nac_Figs = figure('Name', 'Patronus Nacelles Results Page', 'Position', [100, 100, 1200, 900]);
 
     %% SUBPLOT 1 and 2: Speed Triangle
     axTriangle1 = subplot(2, 2, 1);
@@ -168,16 +216,40 @@ function generate_results_page_2Wings(results, models,params)
 
     ax4 = subplot(2, 2, 4);
     plot_CD_nac(ax4, alpha_nac2, CD_nac2_opt, models);
+    
+    picturewidth = 20;
+    hw_ratio = 0.65;
+    set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegendInterpreter','latex')
+    set(findall(nac_Figs,'-property','FontSize'),'FontSize',16)
+    set(findall(nac_Figs,'-property','Box'),'Box','off') % optional
+    set(findall(nac_Figs,'-property','Interpreter'),'Interpreter','latex')
+    set(findall(nac_Figs,'-property','TickLabelInterpreter'),'TickLabelInterpreter','latex')
+    set(nac_Figs,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
+    pos = get(nac_Figs,'Position');
+    set(nac_Figs,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
+    print(nac_Figs,'Nacelle_Plots','-dpdf','-vector','-fillpage')  
 
     %% ====================================================
     %% PLOT 6: Forces and Angles Diagram
     %% ====================================================
 
-    figure('Name', 'Patronus Forces Results Page', 'Position', [100, 100, 1200, 900]);
+    forceFig = figure('Name', 'Patronus Forces Results Page', 'Position', [100, 100, 1200, 900]);
 
     axForce = axes();
     %plotforceangles(axForce, results); % This works for 1Wing because I dont have the picture yet. To be improved.
     plotforcesangles_imag(axForce, results,params);
+
+    picturewidth = 20;
+    hw_ratio = 0.65;
+    set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegendInterpreter','latex')
+    set(findall(forceFig,'-property','FontSize'),'FontSize',16)
+    set(findall(forceFig,'-property','Box'),'Box','off') % optional
+    set(findall(forceFig,'-property','Interpreter'),'Interpreter','latex')
+    set(findall(forceFig,'-property','TickLabelInterpreter'),'TickLabelInterpreter','latex')
+    set(forceFig,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
+    pos = get(forceFig,'Position');
+    set(forceFig,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
+    print(forceFig,'Forces_Plots','-dpdf','-vector','-fillpage')  
 end
 
 %% ================================================================

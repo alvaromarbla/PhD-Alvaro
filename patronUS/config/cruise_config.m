@@ -80,12 +80,12 @@ elseif versions.AC_version == "2Wings"
     params.delta0 = 350;                            % [m] Initial altitude
 
     % Operational bounds (all values in SI units)
-    bounds.vars.V        = struct('min', 10,               'max', 40,                    'init', 30.0);
+    bounds.vars.V        = struct('min', 10,               'max', 40,                    'init', 22.0);
     bounds.vars.gamma    = struct('min', deg2rad(0),'max', deg2rad(0),               'init', deg2rad(0));
-    bounds.vars.theta    = struct('min', deg2rad(-30), 'max', deg2rad(45),                'init', deg2rad(3));
-    bounds.vars.alpha    = struct('min', deg2rad(-30), 'max', deg2rad(45),                'init', deg2rad(3));
-    bounds.vars.epsilon1 = struct('min', deg2rad(0),   'max', deg2rad(90),                'init', deg2rad(4));
-    bounds.vars.epsilon2 = struct('min', deg2rad(0),   'max', deg2rad(90),                'init', deg2rad(4));
+    bounds.vars.theta    = struct('min', deg2rad(-30), 'max', deg2rad(45),                'init', deg2rad(14));
+    %bounds.vars.alpha    = struct('min', deg2rad(-30), 'max', deg2rad(45),                'init', deg2rad(3));
+    bounds.vars.epsilon1 = struct('min', deg2rad(0),   'max', deg2rad(90),                'init', deg2rad(40));
+    bounds.vars.epsilon2 = struct('min', deg2rad(0),   'max', deg2rad(90),                'init', deg2rad(40));
     bounds.vars.q        = struct('min', -0.6,             'max', 0.6,                    'init', 0); % Rad/s
 
     % Controls

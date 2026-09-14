@@ -3,7 +3,7 @@ function plotforcesangles_imag(ax, results,params)
     % Extract parameters from your optimization pipeline
     V = results.opt.V;
     gamma = results.opt.gamma;
-    alpha = results.opt.alpha;
+    alpha = results.alpha;
     epsilon1 = results.opt.epsilon1;
     epsilon2 = results.opt.epsilon2;
     xi_dw  = results.xi_dw;
@@ -65,7 +65,7 @@ function plotforcesangles_imag(ax, results,params)
     t_nac2 = hgtransform('Parent', t_fuse);
     img_n2 = imagesc(ax, [-nac_width/2, nac_width/2], [nac_height/2, -nac_height/2], img_nac, 'Parent', t_nac2);
     set(img_n2, 'AlphaData', alpha_nac_img);
-    set(t_nac2, 'Matrix', makehgtform('translate', [params.geo.xtw, params.geo.ztw, 0]) * makehgtform('zrotate', epsilon2));
+    set(t_nac2, 'Matrix', makehgtform('translate', [-params.geo.xtw, params.geo.ztw, 0]) * makehgtform('zrotate', epsilon2));
 
     %% 3. Station Origin Tracking Matrices (Global Coordinates)
     % Rotational matrix tracking the body coordinate frame transformation
@@ -75,7 +75,7 @@ function plotforcesangles_imag(ax, results,params)
     pos_CG   = [0; 0]; % Center of mass chosen as reference origin (0,0)
     pos_wing = R_body * [params.geo.xw;  params.geo.zw];
     pos_fus  = R_body * [params.geo.xfus; params.geo.zfus];
-    pos_tail = R_body * [params.geo.xtw;  params.geo.ztw];
+    pos_tail = R_body * [-params.geo.xtw;  params.geo.ztw];
 
     %% 4. Vector Force Computations & Plot Scaling Pipeline
     % Determine consistent visual layout vector scaling limits
