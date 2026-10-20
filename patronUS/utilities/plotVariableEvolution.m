@@ -8,7 +8,7 @@ function plotVariableEvolution(X_hist, bounds)
                       'epsilon','\epsilon [deg]','n','n [RPS]');
     is_angle = struct('gamma',true,'alpha',true,'epsilon',true);
 
-    figure('Name','Variable Evolution: Initial to Optimal','Position',[100 100 1100 190*n]);
+    ipoptEvoFig = figure('Name','Variable Evolution: Initial to Optimal','Position',[100 100 1100 190*n]);
 
     for k = 1:n
         f    = fields{k};
@@ -40,4 +40,18 @@ function plotVariableEvolution(X_hist, bounds)
     end
 
     legend('trajectory','initial guess','optimal','bounds','Location','bestoutside');
+    picturewidth = 50;
+    hw_ratio = 0.75;
+    set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegendInterpreter','latex')
+    set(findall(ipoptEvoFig,'-property','FontSize'),'FontSize',16)
+    set(findall(ipoptEvoFig,'-property','Box'),'Box','off') % optional
+    set(findall(ipoptEvoFig,'-property','Interpreter'),'Interpreter','latex')
+    set(findall(ipoptEvoFig,'-property','TickLabelInterpreter'),'TickLabelInterpreter','latex')
+    set(ipoptEvoFig,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
+    pos = get(ipoptEvoFig,'Position');
+    set(ipoptEvoFig,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
+    targetFolder = fullfile(fileparts(fileparts(mfilename('fullpath'))), 'Images');
+    if ~isfolder(targetFolder), mkdir(targetFolder); end
+    outputpath = fullfile(targetFolder, 'ipoptEvo');
+    print(ipoptEvoFig, outputpath,'-dpdf','-vector','-fillpage')  
 end

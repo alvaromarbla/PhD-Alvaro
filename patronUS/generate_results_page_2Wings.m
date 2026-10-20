@@ -71,7 +71,7 @@ function generate_results_page_2Wings(results, models,params)
     plot_ch_contour(ax6, J_opt2,phi_opt2, models);
 
     
-    picturewidth = 20;
+    picturewidth = 40;
     hw_ratio = 0.65;
     set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegendInterpreter','latex')
     set(findall(propFig,'-property','FontSize'),'FontSize',16)
@@ -81,7 +81,10 @@ function generate_results_page_2Wings(results, models,params)
     set(propFig,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
     pos = get(propFig,'Position');
     set(propFig,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
-    print(propFig,'Prop_Maps','-dpdf','-vector','-fillpage')
+    targetFolder = fullfile(fileparts(mfilename('fullpath')), 'Images');
+    if ~isfolder(targetFolder), mkdir(targetFolder); end
+    outputpath = fullfile(targetFolder, 'Prop_Maps');
+    print(propFig, outputpath,'-dpdf','-vector','-fillpage')
 
     aeroFigWing = figure('Name', 'Patronus Performance Aero Wing Results Page', 'Position', [100, 100, 1200, 900]);
     %% ====================================================
@@ -108,7 +111,7 @@ function generate_results_page_2Wings(results, models,params)
     ax4 = subplot(2, 2, 4);
     plot_AeroEff_wing(ax4, alpha_opt, CL_wing_opt, CD_wing_opt, models);
 
-    picturewidth = 20;
+    picturewidth = 40;
     hw_ratio = 0.65;
     set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegendInterpreter','latex')
     set(findall(aeroFigWing,'-property','FontSize'),'FontSize',16)
@@ -118,7 +121,10 @@ function generate_results_page_2Wings(results, models,params)
     set(aeroFigWing,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
     pos = get(aeroFigWing,'Position');
     set(aeroFigWing,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
-    print(aeroFigWing,'Aero_Curves_Wing','-dpdf','-vector','-fillpage')
+    targetFolder = fullfile(fileparts(mfilename('fullpath')), 'Images');
+    if ~isfolder(targetFolder), mkdir(targetFolder); end
+    outputpath = fullfile(targetFolder, 'Aero_Curves_Wing');
+    print(aeroFigWing, outputpath,'-dpdf','-vector','-fillpage')
 
     aeroFigFus = figure('Name', 'Patronus Performance Aero Fuselage Results Page', 'Position', [100, 100, 1200, 900]);
 
@@ -146,7 +152,7 @@ function generate_results_page_2Wings(results, models,params)
     ax4 = subplot(2, 2, 4);
     plot_AeroEff_fuselage(ax4, alpha_opt, CL_fuselage_opt, CD_fuselage_opt, models);
 
-    picturewidth = 20;
+    picturewidth = 40;
     hw_ratio = 0.65;
     set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegendInterpreter','latex')
     set(findall(aeroFigFus,'-property','FontSize'),'FontSize',16)
@@ -156,7 +162,10 @@ function generate_results_page_2Wings(results, models,params)
     set(aeroFigFus,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
     pos = get(aeroFigFus,'Position');
     set(aeroFigFus,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
-    print(aeroFigFus,'Aero_Curves_Fus','-dpdf','-vector','-fillpage')
+    targetFolder = fullfile(fileparts(mfilename('fullpath')), 'Images');
+    if ~isfolder(targetFolder), mkdir(targetFolder); end
+    outputpath = fullfile(targetFolder, 'Aero_Curves_Fus');
+    print(aeroFigFus, outputpath,'-dpdf','-vector','-fillpage')
 
 
     aeroFigureTail = figure('Name', 'Patronus Performance Aero Tail Results Page', 'Position', [100, 100, 1200, 900]);
@@ -185,7 +194,7 @@ function generate_results_page_2Wings(results, models,params)
     ax4 = subplot(2, 2, 4);
     plot_AeroEff_tail(ax4,  alpha_opt-xi_dw, CL_tail_opt, CD_tail_opt, models);
 
-    picturewidth = 20;
+    picturewidth = 40;
     hw_ratio = 0.65;
     set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegendInterpreter','latex')
     set(findall(aeroFigureTail,'-property','FontSize'),'FontSize',16)
@@ -195,7 +204,10 @@ function generate_results_page_2Wings(results, models,params)
     set(aeroFigureTail,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
     pos = get(aeroFigureTail,'Position');
     set(aeroFigureTail,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
-    print(aeroFigureTail,'Aero_Curves_Tail','-dpdf','-vector','-fillpage')    
+    targetFolder = fullfile(fileparts(mfilename('fullpath')), 'Images');
+    if ~isfolder(targetFolder), mkdir(targetFolder); end
+    outputpath = fullfile(targetFolder, 'Aero_Curves_Tail');
+    print(aeroFigureTail,outputpath,'-dpdf','-vector','-fillpage')    
 
     %% ====================================================
     %% PLOT 5: Nacelle speed triangles and drag
@@ -217,7 +229,7 @@ function generate_results_page_2Wings(results, models,params)
     ax4 = subplot(2, 2, 4);
     plot_CD_nac(ax4, alpha_nac2, CD_nac2_opt, models);
     
-    picturewidth = 20;
+    picturewidth = 40;
     hw_ratio = 0.65;
     set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegendInterpreter','latex')
     set(findall(nac_Figs,'-property','FontSize'),'FontSize',16)
@@ -227,7 +239,10 @@ function generate_results_page_2Wings(results, models,params)
     set(nac_Figs,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
     pos = get(nac_Figs,'Position');
     set(nac_Figs,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
-    print(nac_Figs,'Nacelle_Plots','-dpdf','-vector','-fillpage')  
+    targetFolder = fullfile(fileparts(mfilename('fullpath')), 'Images');
+    if ~isfolder(targetFolder), mkdir(targetFolder); end
+    outputpath = fullfile(targetFolder, 'Nacelle_Plots');
+    print(nac_Figs,outputpath,'-dpdf','-vector','-fillpage')  
 
     %% ====================================================
     %% PLOT 6: Forces and Angles Diagram
@@ -239,7 +254,7 @@ function generate_results_page_2Wings(results, models,params)
     %plotforceangles(axForce, results); % This works for 1Wing because I dont have the picture yet. To be improved.
     plotforcesangles_imag(axForce, results,params);
 
-    picturewidth = 20;
+    picturewidth = 40;
     hw_ratio = 0.65;
     set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegendInterpreter','latex')
     set(findall(forceFig,'-property','FontSize'),'FontSize',16)
@@ -249,7 +264,10 @@ function generate_results_page_2Wings(results, models,params)
     set(forceFig,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
     pos = get(forceFig,'Position');
     set(forceFig,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
-    print(forceFig,'Forces_Plots','-dpdf','-vector','-fillpage')  
+    targetFolder = fullfile(fileparts(mfilename('fullpath')), 'Images');
+    if ~isfolder(targetFolder), mkdir(targetFolder); end
+    outputpath = fullfile(targetFolder, 'Forces_Plots');
+    print(forceFig, outputpath,'-dpdf','-vector','-fillpage')  
 end
 
 %% ================================================================
@@ -696,14 +714,14 @@ function plotspeedtriangle_nac(ax, V_inf , v_i, V_nac, phi)
     mid_vi  = V_inf_vec + (vi_vec / 2);
     mid_nac = V_nac_vec / 2;
 
-    text(ax, mid_inf(1), mid_inf(2) + 1.5, sprintf('V_{\\infty} = %.1f m/s', V_inf), ...
-        'Color', [0 0.4470 0.7410], 'FontWeight', 'bold', 'HorizontalAlignment', 'center');
+    text(ax, mid_inf(1), mid_inf(2) + 1.5, sprintf('$\\mathbf{V_{\\infty} = %.1f\\mathrm{\\ m/s}}$', V_inf), ...
+        'Color', [0 0.4470 0.7410], 'HorizontalAlignment', 'center', 'Interpreter', 'latex');
 
-    text(ax, mid_vi(1) + 1.0, mid_vi(2), sprintf('v_i = %.1f m/s', v_i), ...
-        'Color', [0.8500 0.3250 0.0980], 'FontWeight', 'bold', 'HorizontalAlignment', 'left');
+    text(ax, mid_vi(1) + 1.0, mid_vi(2), sprintf('$\\mathbf{v_i = %.1f\\mathrm{\\ m/s}}$', v_i), ...
+        'Color', [0.8500 0.3250 0.0980], 'HorizontalAlignment', 'left','Interpreter', 'latex');
 
-    text(ax, mid_nac(1) - 1.5, mid_nac(2) - 1.0, sprintf('V_{nac} = %.1f m/s', V_nac), ...
-        'Color', [0.4660 0.6740 0.1880], 'FontWeight', 'bold', 'HorizontalAlignment', 'right');
+    text(ax, mid_nac(1) - 1.5, mid_nac(2) - 1.0, sprintf('$\\mathbf{V_{nac} = %.1f\\mathrm{\\ m/s}}$', V_nac), ...
+        'Color', [0.4660 0.6740 0.1880], 'HorizontalAlignment', 'right','Interpreter','latex');
 
     %% 4. Clean up Title and Limits
     title(ax, 'Nacelle Velocity Inflow Triangle', 'Interpreter', 'tex');

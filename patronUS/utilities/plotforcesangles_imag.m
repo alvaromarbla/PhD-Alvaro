@@ -155,5 +155,7 @@ function DrawLocalArc(ax, ox, oy, start_ang, delta_ang, radius, color, label)
 
     tx = ox + radius * 1.25 * cos(start_ang + delta_ang/2);
     ty = oy + radius * 1.25 * sin(start_ang + delta_ang/2);
-    text(ax, tx, ty, label, 'Color', color, 'FontSize', 10, 'FontWeight', 'bold');
+
+    latex_label = ['{\boldmath$', label, '$}'];
+    text(ax, tx, ty, latex_label, 'Color', color, 'FontSize', 10, 'Interpreter','latex');
 end

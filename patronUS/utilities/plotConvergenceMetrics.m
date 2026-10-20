@@ -1,7 +1,7 @@
 function plotConvergenceMetrics(stats, viol, slack)
     iterations = 0:(numel(stats.iterations.inf_pr)-1);
 
-    figure('Name','Constraint Violation & Slack','Position',[100 100 1100 800]);
+    ipoptMetFig = figure('Name','Constraint Violation & Slack','Position',[100 100 1100 800]);
 
     % Panel 1: IPOPT's own infeasibility metrics
     subplot(3,1,1); hold on; grid on;
@@ -28,4 +28,19 @@ function plotConvergenceMetrics(stats, viol, slack)
     end
     title('Normalized Bound Slack (0 = at bound)'); ylabel('Slack (log)');
     xlabel('IPOPT Iteration'); legend(fields, 'Location','best');
+
+    picturewidth = 50;
+    hw_ratio = 0.75;
+    set(groot, 'defaultAxesTickLabelInterpreter','latex'); set(groot, 'defaultLegendInterpreter','latex')
+    set(findall(ipoptMetFig,'-property','FontSize'),'FontSize',16)
+    set(findall(ipoptMetFig,'-property','Box'),'Box','off') % optional
+    set(findall(ipoptMetFig,'-property','Interpreter'),'Interpreter','latex')
+    set(findall(ipoptMetFig,'-property','TickLabelInterpreter'),'TickLabelInterpreter','latex')
+    set(ipoptMetFig,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
+    pos = get(ipoptMetFig,'Position');
+    set(ipoptMetFig,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
+    targetFolder = fullfile(fileparts(fileparts(mfilename('fullpath'))), 'Images');
+    if ~isfolder(targetFolder), mkdir(targetFolder); end
+    outputpath = fullfile(targetFolder, 'ipoptMetric');
+    print(ipoptMetFig, outputpath,'-dpdf','-vector','-fillpage')  
 end
