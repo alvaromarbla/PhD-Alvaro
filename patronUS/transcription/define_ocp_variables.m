@@ -53,11 +53,19 @@ vars.U  = diag(vars.u_scale)*vars.Un;
 vars.Um = diag(vars.u_scale)*vars.Umn;
 
 %% States: bounds and initial guess
+% No box bound at the nodes fixed by a boundary condition (x0 at the first
+% node, xf at the last): there the bound duplicates the equality, which
+% makes the constraint Jacobian degenerate (vars.con.X_nodes keeps the
+% bounded nodes)
 
 for i = 1:vars.nx
     cfg = bounds.states.(vars.state_names{i});
     s   = vars.x_scale(i);
-    vars.con.X{i} = (cfg.min/s <= vars.Xn(i,:) <= cfg.max/s);
+    nodes = 1:N+1;
+    if ~isnan(cfg.x0), nodes = nodes(nodes ~= 1);   end
+    if ~isnan(cfg.xf), nodes = nodes(nodes ~= N+1); end
+    vars.con.X_nodes{i} = nodes;
+    vars.con.X{i} = (cfg.min/s <= vars.Xn(i,nodes) <= cfg.max/s);
     opti.subject_to(vars.con.X{i});
     opti.set_initial(vars.Xn(i,:), guess_profile(cfg.init, vars.tau)/s);
 end

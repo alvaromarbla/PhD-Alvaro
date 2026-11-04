@@ -42,9 +42,10 @@ end
 % [lower bound multipliers, upper bound multipliers], both >= 0
 
 for i = 1:vars.nx
-    name = vars.state_names{i};
+    name  = vars.state_names{i};
+    nodes = vars.con.X_nodes{i}; % Nodes fixed by boundary conditions are not bounded
     [lo, up] = bound_dual(value_fcn, opti, vars.con.X{i});
-    rows = [rows, bound_rows(name, results.(name), lo, up, t, bounds.states.(name), tol)]; %#ok<AGROW>
+    rows = [rows, bound_rows(name, results.(name)(nodes), lo, up, t(nodes), bounds.states.(name), tol)]; %#ok<AGROW>
 end
 for i = 1:vars.nu
     name = vars.control_names{i};
