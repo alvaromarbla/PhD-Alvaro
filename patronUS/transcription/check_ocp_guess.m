@@ -1,7 +1,8 @@
 function chk = check_ocp_guess(guess, dynamics_fcn, constraint_fcn, bounds, models, params)
 %CHECK_OCP_GUESS Feasibility of an initial guess against the continuous OCP.
 %   guess has the layout of unpack_ocp_solution (t, tf, <state>, <control>).
-%   Checks, at every point of the guess:
+%   build_continuous_model only needs the names from vars, so the check is
+%   done with the same Function the NLP uses. Checks, at every point:
 %     bound_viol: state/control box bounds and tf bounds, as a fraction of
 %                 each variable's range
 %     bc_viol:    boundary conditions x0, xf (and xf_min/xf_max), same scaling
@@ -37,28 +38,23 @@ for i = 1:numel(control_names)
     bound_viol = max(bound_viol, range_violation(guess.(control_names{i}), bounds.controls.(control_names{i})));
 end
 
-%% Path constraints and dynamics, point by point
+%% Path constraints and dynamics at all points
+% Same continuous model Function as the NLP, mapped over the guess points
+% in one call (numeric DM arithmetic point by point is very slow)
 
-path_viol = 0;
-xdot_mod = zeros(numel(state_names), n_pts);
+vars_g.state_names   = state_names;
+vars_g.control_names = control_names;
+vars_g.nx = numel(state_names);
+vars_g.nu = numel(control_names);
+model = build_continuous_model(dynamics_fcn, constraint_fcn, vars_g, models, params, bounds);
 
-for k = 1:n_pts
-    Z = struct();
-    for i = 1:numel(state_names)
-        Z.(state_names{i}) = guess.(state_names{i})(k);
-    end
-    for i = 1:numel(control_names)
-        Z.(control_names{i}) = guess.(control_names{i})(k);
-    end
+X = cellfun(@(name) guess.(name), state_names,   'UniformOutput', false);
+U = cellfun(@(name) guess.(name), control_names, 'UniformOutput', false);
+F_pts = model.F.map(n_pts);
+[xdot_mod, c, ceq] = F_pts(vertcat(X{:}), vertcat(U{:}));
 
-    [c, ceq] = constraint_fcn(Z, models, params, bounds);
-    path_viol = max([path_viol; full(c(:)); abs(full(ceq(:)))]);
-
-    xdot = dynamics_fcn(Z, models, params);
-    for i = 1:numel(state_names)
-        xdot_mod(i,k) = full(xdot.(state_names{i}));
-    end
-end
+xdot_mod  = full(xdot_mod);
+path_viol = max([0; full(c(:)); abs(full(ceq(:)))]);
 
 dyn_res = 0;
 for i = 1:numel(state_names)

@@ -28,51 +28,43 @@ hs  = flat_output_spline(t, tf, [S.h.x0,     S.vh.x0, 0], [S.h.xf,      S.vh.xf,
 ths = flat_output_spline(t, tf, [S.theta.x0, S.q.x0,  0], [S.theta.xf,  S.q.xf,  0]);
 
 %% Controls by inversion
+% Vectorised over all points: the forces are evaluated through one mapped
+% CasADi Function (numeric DM arithmetic point by point is very slow)
 
 n_pts = numel(t);
-[epsilon, n1, n2, P] = deal(zeros(1, n_pts));
+F_pts = forces_function(models, params).map(n_pts);
+ones_pts = ones(1, n_pts);
 
-for k = 1:n_pts
-    Z = struct('x', xs.p(k), 'h', hs.p(k), 'vx', xs.d(k), 'vh', hs.d(k), ...
-               'theta', ths.p(k), 'q', ths.d(k), 'E', 0, ...
-               'epsilon1', pi/2, 'epsilon2', pi/2, 'n1', mean(C.n1.init), 'n2', mean(C.n2.init));
+% Aero forces and moments only depend on the states (dummy controls)
+F = eval_forces(F_pts, xs.d, hs.d, ths.p, pi/2*ones_pts, pi/2*ones_pts, ...
+                mean(C.n1.init)*ones_pts, mean(C.n2.init)*ones_pts);
+cg = xs.d./F.V;
+sg = hs.d./F.V;
 
-    % Aero forces and moments only depend on the states
-    F = vtolto_forces_3GDL(Z, models, params);
-    V     = full(F.V);
-    alpha = full(F.alpha);
-    L_aero = full(F.L_aero);
-    D_aero = full(F.D_aero);
-    cg = Z.vx/V;
-    sg = Z.vh/V;
+% Thrust vector required by the force balance (inertial axes)
+Tx = params.mass*xs.dd - (-F.D_aero.*cg - F.L_aero.*sg);
+Th = params.mass*(hs.dd + params.g) - (-F.D_aero.*sg + F.L_aero.*cg);
+T_tot = hypot(Tx, Th);
 
-    % Thrust vector required by the force balance (inertial axes)
-    Tx = params.mass*xs.dd(k) - (-D_aero*cg - L_aero*sg);
-    Th = params.mass*(hs.dd(k) + params.g) - (-D_aero*sg + L_aero*cg);
-    T_tot = hypot(Tx, Th);
+epsilon = min(max(atan2(Th, Tx) - ths.p, C.epsilon1.min), C.epsilon1.max);
 
-    epsilon(k) = min(max(atan2(Th, Tx) - Z.theta, C.epsilon1.min), C.epsilon1.max);
+% Differential thrust to trim the moment:
+% (T1-T2)*sin(eps)*xtw - (T1+T2)*cos(eps)*ztw = Iyy*thetaddot - M_aero
+M_aero = F.MA + F.M_Wing + F.M_Fus + F.M_Tail;
+M_req  = params.Iyy*ths.dd - M_aero;
+dT   = zeros(1, n_pts);
+trim = abs(sin(epsilon)) > 0.2;
+dT(trim) = (M_req(trim) + T_tot(trim).*cos(epsilon(trim))*params.geo.ztw) ...
+           ./(sin(epsilon(trim))*params.geo.xtw);
+dT = min(max(dT, -0.9*T_tot), 0.9*T_tot);
 
-    % Differential thrust to trim the moment:
-    % (T1-T2)*sin(eps)*xtw - (T1+T2)*cos(eps)*ztw = Iyy*thetaddot - M_aero
-    M_aero = full(F.MA + F.M_Wing + F.M_Fus + F.M_Tail);
-    M_req  = params.Iyy*ths.dd(k) - M_aero;
-    dT = 0;
-    if abs(sin(epsilon(k))) > 0.2
-        dT = (M_req + T_tot*cos(epsilon(k))*params.geo.ztw)/(sin(epsilon(k))*params.geo.xtw);
-        dT = min(max(dT, -0.9*T_tot), 0.9*T_tot);
-    end
+phi = F.alpha + epsilon;
+n1 = thrust_to_rps((T_tot + dT)/2, F.V, phi, C.n1, models, params);
+n2 = thrust_to_rps((T_tot - dT)/2, F.V, phi, C.n2, models, params);
 
-    phi = alpha + epsilon(k);
-    n1(k) = thrust_to_rps((T_tot + dT)/2, V, phi, C.n1, models, params);
-    n2(k) = thrust_to_rps((T_tot - dT)/2, V, phi, C.n2, models, params);
-
-    % Power with the inverted controls
-    Z.epsilon1 = epsilon(k);  Z.epsilon2 = epsilon(k);
-    Z.n1 = n1(k);             Z.n2 = n2(k);
-    F = vtolto_forces_3GDL(Z, models, params);
-    P(k) = full(F.P1 + F.P2);
-end
+% Power with the inverted controls
+F = eval_forces(F_pts, xs.d, hs.d, ths.p, epsilon, epsilon, n1, n2);
+P = F.P1 + F.P2;
 
 %% Output
 
@@ -94,18 +86,43 @@ guess.n2       = n2;
 
 end
 
+function F = forces_function(models, params)
+% vtolto_forces_3GDL as a CasADi Function of [vx; vh; theta; epsilon1; epsilon2; n1; n2],
+% returning the fields used here stacked in one column
+import casadi.*
+z = MX.sym('z', 7);
+Z = struct('vx', z(1), 'vh', z(2), 'theta', z(3), ...
+           'epsilon1', z(4), 'epsilon2', z(5), 'n1', z(6), 'n2', z(7));
+Fs = vtolto_forces_3GDL(Z, models, params);
+out = cellfun(@(name) Fs.(name), force_names(), 'UniformOutput', false);
+F = Function('F_forces', {z}, {vertcat(out{:})});
+end
+
+function names = force_names()
+names = {'V', 'alpha', 'L_aero', 'D_aero', 'MA', 'M_Wing', 'M_Fus', 'M_Tail', 'P1', 'P2'};
+end
+
+function F = eval_forces(F_pts, vx, vh, theta, epsilon1, epsilon2, n1, n2)
+% Evaluate the mapped Function at all points, one row per field
+vals  = full(F_pts([vx; vh; theta; epsilon1; epsilon2; n1; n2]));
+names = force_names();
+for i = 1:numel(names)
+    F.(names{i}) = vals(i,:);
+end
+end
+
 function n = thrust_to_rps(T, V, phi, cfg, models, params)
-% Solve T = Ne*CT(J(n), phi)*rho*n^2*D^4 for n by fixed-point iteration
+% Solve T = Ne*CT(J(n), phi)*rho*n^2*D^4 for n by fixed-point iteration (all points at once)
 D  = params.prop.diameter;
 Ne = params.prop.num_engines;
+CT_pts = models.CT_lookup.map(numel(T));
 
-n = mean(cfg.init);
+n = mean(cfg.init)*ones(size(T));
+no_thrust = false(size(T)); % CT <= 0: the propeller cannot give the thrust, saturate
 for it = 1:20
-    CT = full(models.CT_lookup(V/(n*D), phi));
-    if CT <= 0
-        n = cfg.max;
-        return
-    end
-    n = min(max(sqrt(max(T, 0)/(Ne*CT*params.rho*D^4)), cfg.min), cfg.max);
+    CT = full(CT_pts(V./(n*D), phi));
+    no_thrust = no_thrust | CT <= 0;
+    n = min(max(sqrt(max(T, 0)./(Ne*max(CT, eps)*params.rho*D^4)), cfg.min), cfg.max);
+    n(no_thrust) = cfg.max;
 end
 end
