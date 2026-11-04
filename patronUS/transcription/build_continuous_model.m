@@ -9,6 +9,7 @@ function model = build_continuous_model(dynamics_fcn, constraint_fcn, vars, mode
 %   Z holds one scalar per state and control name (like X_struct in cruise).
 %   Scalar fields of both dbg structs are stacked into the 'dbg' output so
 %   they can be evaluated at the solution (see unpack_ocp_solution).
+%   An optional cell dbg.c_names from constraint_fcn labels the rows of c.
 
 import casadi.*
 
@@ -49,7 +50,7 @@ for k = 1:numel(con_names)
     dbg.(con_names{k}) = dbg_con.(con_names{k});
 end
 dbg_names = fieldnames(dbg);
-dbg_names = dbg_names(cellfun(@(name) isequal(size(dbg.(name)), [1 1]), dbg_names));
+dbg_names = dbg_names(cellfun(@(name) ~iscell(dbg.(name)) && isequal(size(dbg.(name)), [1 1]), dbg_names));
 dbg_vec   = cellfun(@(name) dbg.(name), dbg_names, 'UniformOutput', false);
 dbg_vec   = vertcat(MX(0,1), dbg_vec{:});
 
@@ -60,5 +61,12 @@ model.F = Function('F_continuous', {x, u}, {xdot, c, ceq, dbg_vec}, ...
 model.n_c       = size(c, 1);
 model.n_ceq     = size(ceq, 1);
 model.dbg_names = dbg_names;
+
+% Row labels of c (optional dbg.c_names of the constraint function)
+if isfield(dbg_con, 'c_names')
+    model.c_names = dbg_con.c_names;
+else
+    model.c_names = arrayfun(@(k) sprintf('c%d', k), 1:model.n_c, 'UniformOutput', false);
+end
 
 end

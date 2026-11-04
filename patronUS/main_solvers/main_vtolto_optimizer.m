@@ -105,7 +105,10 @@ for stage = 1:numel(versions.transcription)
 
     %% Call Objective Function
 
-    obj_fun = objective_fcn(ocp.traj, models, params);
+    % Physical objective + control-rate regulariser (params.ocp.reg_weight, 0 = off)
+    obj_phys = objective_fcn(ocp.traj, models, params);
+    obj_reg  = control_rate_penalty(vars, params.ocp.reg_weight);
+    obj_fun  = obj_phys + obj_reg;
     opti.minimize(obj_fun);
 
     %% Call Constraints
@@ -157,6 +160,13 @@ for stage = 1:numel(versions.transcription)
 
     % Trajectory at the nodes, by name (also on a failed solve, for inspection)
     results = unpack_ocp_solution(value_fcn, vars, model);
+
+    fval_phys = full(value_fcn(obj_phys));
+    fval_reg  = full(value_fcn(obj_reg));
+    fprintf('\nStage %d objective: %.6f (physical %.6f + regulariser %.6f)\n', stage, fval, fval_phys, fval_reg);
+
+    % Multipliers and slack of the inequality constraints and bounds
+    activity = report_constraint_activity(value_fcn, opti, vars, model, ocp, con_ineq, bounds, results);
 
     if ~solve_ok
         warning('Stage %d (%s) did not converge: later stages skipped.', stage, versions.transcription(stage));

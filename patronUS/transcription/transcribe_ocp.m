@@ -28,8 +28,10 @@ defects = defects ./ repmat(vars.x_scale, 1, N);
 
 bc      = {};
 bc_ineq = {};
+bc_ineq_names = {};
 for i = 1:vars.nx
-    cfg = bounds.states.(vars.state_names{i});
+    name = vars.state_names{i};
+    cfg  = bounds.states.(name);
     if ~isnan(cfg.x0)
         bc{end+1, 1} = (vars.X(i,1)   - cfg.x0)/vars.x_scale(i); %#ok<AGROW>
     end
@@ -38,9 +40,11 @@ for i = 1:vars.nx
     end
     if isfield(cfg, 'xf_max')
         bc_ineq{end+1, 1} = (vars.X(i,end) - cfg.xf_max)/vars.x_scale(i); %#ok<AGROW>
+        bc_ineq_names{end+1} = sprintf('%s(tf) <= %g', name, cfg.xf_max); %#ok<AGROW>
     end
     if isfield(cfg, 'xf_min')
         bc_ineq{end+1, 1} = (cfg.xf_min - vars.X(i,end))/vars.x_scale(i); %#ok<AGROW>
+        bc_ineq_names{end+1} = sprintf('%s(tf) >= %g', name, cfg.xf_min); %#ok<AGROW>
     end
 end
 bc      = vertcat(bc{:});
@@ -56,6 +60,8 @@ ocp.n_path_c  = model.n_c*(N+1);
 ocp.n_path_eq = model.n_ceq*(N+1);
 ocp.n_bc      = size(bc, 1);
 ocp.n_bc_ineq = size(bc_ineq, 1);
+ocp.bc_ineq       = bc_ineq;       % For report_constraint_activity
+ocp.bc_ineq_names = bc_ineq_names;
 ocp.n_ineq    = ocp.n_path_c + ocp.n_bc_ineq;
 ocp.n_eq      = ocp.n_defects + ocp.n_path_eq + ocp.n_bc;
 

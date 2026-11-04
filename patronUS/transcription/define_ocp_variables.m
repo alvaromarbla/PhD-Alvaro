@@ -13,6 +13,13 @@ function vars = define_ocp_variables(opti, bounds, N, method)
 %   'init' is the initial guess: a scalar (constant) or [start end] (linear
 %   in time). Box bounds and initial guess are applied here; the boundary
 %   conditions x0/xf are imposed in transcribe_ocp.
+%
+%   Nondimensional variables: IPOPT works on Xn, Un, Umn = X, U, Um divided
+%   by x_scale / u_scale = max(|min|, |max|, 1) of each row, so all of them
+%   are O(1). vars.X, vars.U, vars.Um are the physical expressions used by
+%   the rest of the code; initial guesses are set through set_ocp_initial_guess.
+%   The bound constraints are kept in vars.con so their multipliers can be
+%   read after the solve (report_constraint_activity).
 
 import casadi.*
 
@@ -25,51 +32,68 @@ vars.N  = N;
 vars.tau     = linspace(0, 1, N+1);
 vars.tau_mid = 0.5*(vars.tau(1:end-1) + vars.tau(2:end));
 
-%% Allocate variables
+%% Scaling
 
-vars.X  = opti.variable(vars.nx, N+1);
-vars.U  = opti.variable(vars.nu, N+1);
+vars.x_scale = cellfun(@(name) row_scale(bounds.states.(name)),   vars.state_names);
+vars.u_scale = cellfun(@(name) row_scale(bounds.controls.(name)), vars.control_names);
+
+%% Allocate nondimensional variables and physical expressions
+
+vars.Xn = opti.variable(vars.nx, N+1);
+vars.Un = opti.variable(vars.nu, N+1);
 if method.midpoints
-    vars.Um = opti.variable(vars.nu, N);
+    vars.Umn = opti.variable(vars.nu, N);
 else
-    vars.Um = MX(vars.nu, 0);
+    vars.Umn = MX(vars.nu, 0);
 end
 vars.tf = opti.variable();
 
-%% States: bounds, initial guess and scaling
+vars.X  = diag(vars.x_scale)*vars.Xn;
+vars.U  = diag(vars.u_scale)*vars.Un;
+vars.Um = diag(vars.u_scale)*vars.Umn;
 
-vars.x_scale = ones(vars.nx, 1); % Used to scale defects and boundary conditions
+%% States: bounds and initial guess
 
 for i = 1:vars.nx
     cfg = bounds.states.(vars.state_names{i});
-    opti.subject_to(cfg.min <= vars.X(i,:) <= cfg.max);
-    opti.set_initial(vars.X(i,:), guess_profile(cfg.init, vars.tau));
-    vars.x_scale(i) = max([abs(cfg.min), abs(cfg.max), 1]);
+    s   = vars.x_scale(i);
+    vars.con.X{i} = (cfg.min/s <= vars.Xn(i,:) <= cfg.max/s);
+    opti.subject_to(vars.con.X{i});
+    opti.set_initial(vars.Xn(i,:), guess_profile(cfg.init, vars.tau)/s);
 end
 
 %% Controls: bounds and initial guess
 
+vars.con.Um = cell(1, vars.nu);
 for i = 1:vars.nu
     cfg = bounds.controls.(vars.control_names{i});
-    opti.subject_to(cfg.min <= vars.U(i,:) <= cfg.max);
-    opti.set_initial(vars.U(i,:), guess_profile(cfg.init, vars.tau));
+    s   = vars.u_scale(i);
+    vars.con.U{i} = (cfg.min/s <= vars.Un(i,:) <= cfg.max/s);
+    opti.subject_to(vars.con.U{i});
+    opti.set_initial(vars.Un(i,:), guess_profile(cfg.init, vars.tau)/s);
     if method.midpoints
-        opti.subject_to(cfg.min <= vars.Um(i,:) <= cfg.max);
-        opti.set_initial(vars.Um(i,:), guess_profile(cfg.init, vars.tau_mid));
+        vars.con.Um{i} = (cfg.min/s <= vars.Umn(i,:) <= cfg.max/s);
+        opti.subject_to(vars.con.Um{i});
+        opti.set_initial(vars.Umn(i,:), guess_profile(cfg.init, vars.tau_mid)/s);
     end
 end
 
 %% Final time
 
 cfg = bounds.time.tf;
-opti.subject_to(cfg.min <= vars.tf <= cfg.max);
+vars.con.tf = (cfg.min <= vars.tf <= cfg.max);
+opti.subject_to(vars.con.tf);
 opti.set_initial(vars.tf, cfg.init);
 
-%% Flat decision vector (iteration history / bound slack)
+%% Flat decision vector in physical units (iteration history / bound slack)
 % Layout: [X(:); U(:); Um(:); tf], column-major (node by node)
 
 vars.w = [vars.X(:); vars.U(:); vars.Um(:); vars.tf];
 
+end
+
+function s = row_scale(cfg)
+s = max([abs(cfg.min), abs(cfg.max), 1]);
 end
 
 function y = guess_profile(init, tau)

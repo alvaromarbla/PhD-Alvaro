@@ -19,6 +19,7 @@ if versions.AC_version == "2Wings"
     % Transcription
     params.ocp.N      = 40;                        % Number of collocation intervals
     params.ocp.tf_ref = 10;                        % [s] Reference time (min-time objective scaling)
+    params.ocp.reg_weight = 1e-3;                  % [-] Control-rate regulariser (control_rate_penalty), 0 = off
 
     % Flat initial guess: built for each tf in the sweep, the feasible one
     % with the lowest objective feeds the first stage
