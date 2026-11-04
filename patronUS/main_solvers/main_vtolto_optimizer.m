@@ -180,6 +180,7 @@ end
 
 if solve_ok
     vtolto_plot_results(results, params)
+    plot_constraint_activity(activity) % Multipliers and limits per node
 else
     warning('Skipping post-processing: no converged solution.');
 end

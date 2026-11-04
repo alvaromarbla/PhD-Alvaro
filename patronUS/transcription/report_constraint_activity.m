@@ -1,27 +1,34 @@
 function activity = report_constraint_activity(value_fcn, opti, vars, model, ocp, con_ineq, bounds, results)
 %REPORT_CONSTRAINT_ACTIVITY Multipliers and slack of the inequality constraints at the solution.
-%   For every path constraint row, final-state inequality and variable
-%   bound (lower and upper side separately):
-%     n_active:  points where the constraint is active (slack <= 1e-6)
-%     lam_max:   largest |multiplier| and the time t_lam where it occurs.
-%                The multiplier is the sensitivity of the objective to the
-%                limit: relaxing it by one (normalised) unit lowers the
-%                objective by about lam. Zero means the constraint does not
-%                shape the solution, even if it is touched. For bounds the
-%                unit is the nondimensional variable (v/scale).
-%     slack_min: smallest distance to the limit and its time t_slack.
-%                Path rows are normalised by their limit (vtolto path
-%                constraints), bounds by the variable range.
-%   Rows with a multiplier or within 5 % of their limit are printed, sorted
-%   by lam_max. activity holds all rows.
+%   Each constraint of the OCP is one NLP constraint per node (and per
+%   midpoint for bounds on Hermite-Simpson midpoint controls), each with
+%   its own multiplier. For every path constraint row, final-state
+%   inequality and variable bound (lower and upper side separately) this
+%   keeps the per-node arrays and summarises them:
+%     t, value, limit: the constrained quantity at each node and its limit.
+%                Bounds in physical units; path rows and final-state
+%                inequalities as the normalised constraint c (limit 0).
+%     slack:     distance to the limit, normalised (path rows by their
+%                limit, bounds by the variable range).
+%     lam:       multiplier per node: sensitivity of the objective to the
+%                limit at that node. A node's multiplier is roughly the
+%                continuous multiplier times the interval length, so it
+%                shrinks with N.
+%     lam_sum:   sum over nodes, the sensitivity to relaxing the limit along
+%                the whole trajectory (independent of N). Rows are sorted by it.
+%     n_active:  nodes where lam > slack. IPOPT ends with lam*slack ~ mu
+%                (~1e-9) for every inequality, so the larger factor tells
+%                whether the constraint binds (lam) or has slack (slack).
+%   Multipliers are per unit of the normalised limit; for bounds, per unit
+%   of the nondimensional variable (v/scale).
+%   Rows with an active node or within 5 % of their limit are printed.
+%   plot_constraint_activity draws the per-node arrays.
 %   value_fcn: @(e) sol_obj.value(e) or @(e) opti.debug.value(e).
 
-tol = 1e-6;
-t     = results.t;
-N1    = vars.N + 1;
+t  = results.t;
+N1 = vars.N + 1;
 
-rows = struct('name', {}, 'n_active', {}, 'n_points', {}, 'lam_max', {}, ...
-              't_lam', {}, 'slack_min', {}, 't_slack', {});
+rows = struct([]);
 
 %% Path constraints and final-state inequalities (con_ineq = [c_path(:); bc_ineq])
 
@@ -30,11 +37,12 @@ lam_path = reshape(lam_c(1:model.n_c*N1), model.n_c, N1);
 lam_bc   = lam_c(model.n_c*N1+1:end);
 
 for k = 1:model.n_c
-    rows(end+1) = make_row(model.c_names{k}, -results.c_path(k,:), lam_path(k,:), t, tol); %#ok<AGROW>
+    c = results.c_path(k,:);
+    rows = [rows, make_row(model.c_names{k}, 'path', t, c, 0, -c, lam_path(k,:))]; %#ok<AGROW>
 end
 for k = 1:numel(ocp.bc_ineq_names)
-    slack = -full(value_fcn(ocp.bc_ineq(k)));
-    rows(end+1) = make_row(ocp.bc_ineq_names{k}, slack, lam_bc(k), t(end), tol); %#ok<AGROW>
+    c = full(value_fcn(ocp.bc_ineq(k)));
+    rows = [rows, make_row(ocp.bc_ineq_names{k}, 'final', t(end), c, 0, -c, lam_bc(k))]; %#ok<AGROW>
 end
 
 %% Variable bounds
@@ -45,38 +53,38 @@ for i = 1:vars.nx
     name  = vars.state_names{i};
     nodes = vars.con.X_nodes{i}; % Nodes fixed by boundary conditions are not bounded
     [lo, up] = bound_dual(value_fcn, opti, vars.con.X{i});
-    rows = [rows, bound_rows(name, results.(name)(nodes), lo, up, t(nodes), bounds.states.(name), tol)]; %#ok<AGROW>
+    rows = [rows, bound_rows(name, t(nodes), results.(name)(nodes), lo, up, bounds.states.(name))]; %#ok<AGROW>
 end
 for i = 1:vars.nu
     name = vars.control_names{i};
+    tt   = t;
     vals = results.(name);
     [lo, up] = bound_dual(value_fcn, opti, vars.con.U{i});
-    tt   = t;
     if size(vars.Umn, 2) > 0
         [lo_m, up_m] = bound_dual(value_fcn, opti, vars.con.Um{i});
-        vals = [vals, results.mid.(name)];
-        lo   = [lo, lo_m];
-        up   = [up, up_m];
-        tt   = [tt, results.t_mid];
+        [tt, order] = sort([tt, results.t_mid]); % Nodes and midpoints in time order
+        vals = [vals, results.mid.(name)];  vals = vals(order);
+        lo   = [lo, lo_m];                  lo   = lo(order);
+        up   = [up, up_m];                  up   = up(order);
     end
-    rows = [rows, bound_rows(name, vals, lo, up, tt, bounds.controls.(name), tol)]; %#ok<AGROW>
+    rows = [rows, bound_rows(name, tt, vals, lo, up, bounds.controls.(name))]; %#ok<AGROW>
 end
 [lo, up] = bound_dual(value_fcn, opti, vars.con.tf);
-rows = [rows, bound_rows('tf', results.tf, lo, up, results.tf, bounds.time.tf, tol)];
+rows = [rows, bound_rows('tf', results.tf, results.tf, lo, up, bounds.time.tf)];
 
 %% Report
 
-[~, order] = sort([rows.lam_max], 'descend');
+[~, order] = sort([rows.lam_sum], 'descend');
 activity = rows(order);
 
-show = [activity.lam_max] > 1e-8 | [activity.slack_min] < 0.05;
+show = [activity.n_active] > 0 | [activity.slack_min] < 0.05;
 fprintf('\nConstraint activity (multiplier = objective decrease per unit relaxation of the normalised limit)\n');
-fprintf('  %-22s %10s %11s %8s %11s %8s\n', 'constraint', 'active', 'max|lambda|', 't [s]', 'min slack', 't [s]');
+fprintf('  %-22s %10s %11s %11s %8s %11s %8s\n', 'constraint', 'active', 'sum lambda', 'max lambda', 't [s]', 'min slack', 't [s]');
 for r = activity(show)
-    fprintf('  %-22s %4d/%-5d %11.3e %8.3f %11.3e %8.3f\n', r.name, r.n_active, r.n_points, ...
-            r.lam_max, r.t_lam, r.slack_min, r.t_slack);
+    fprintf('  %-22s %4d/%-5d %11.3e %11.3e %8.3f %11.3e %8.3f\n', r.name, r.n_active, r.n_points, ...
+            r.lam_sum, r.lam_max, r.t_lam, r.slack_min, r.t_slack);
 end
-fprintf('  (%d constraints with no multiplier and > 5%% slack not shown)\n\n', sum(~show));
+fprintf('  (%d constraints with no active node and > 5%% slack not shown)\n\n', sum(~show));
 
 end
 
@@ -87,15 +95,19 @@ lo  = reshape(lam(1:n),     1, []);
 up  = reshape(lam(n+1:end), 1, []);
 end
 
-function rows = bound_rows(name, vals, lam_lo, lam_up, t, cfg, tol)
+function rows = bound_rows(name, t, vals, lam_lo, lam_up, cfg)
 span = max(cfg.max - cfg.min, eps);
-rows = [make_row(sprintf('%s >= %g', name, cfg.min), (vals - cfg.min)/span, lam_lo, t, tol), ...
-        make_row(sprintf('%s <= %g', name, cfg.max), (cfg.max - vals)/span, lam_up, t, tol)];
+rows = [make_row(sprintf('%s >= %g', name, cfg.min), 'bound', t, vals, cfg.min, (vals - cfg.min)/span, lam_lo), ...
+        make_row(sprintf('%s <= %g', name, cfg.max), 'bound', t, vals, cfg.max, (cfg.max - vals)/span, lam_up)];
 end
 
-function r = make_row(name, slack, lam, t, tol)
-[lam_max,   i] = max(abs(lam));
+function r = make_row(name, kind, t, value, limit, slack, lam)
+lam = abs(lam);
+[lam_max,   i] = max(lam);
 [slack_min, j] = min(slack);
-r = struct('name', name, 'n_active', sum(slack <= tol), 'n_points', numel(slack), ...
-           'lam_max', lam_max, 't_lam', t(i), 'slack_min', slack_min, 't_slack', t(j));
+r = struct('name', name, 'kind', kind, ...
+           'n_active', sum(lam > slack), 'n_points', numel(slack), ...
+           'lam_sum', sum(lam), 'lam_max', lam_max, 't_lam', t(i), ...
+           'slack_min', slack_min, 't_slack', t(j), ...
+           't', t, 'value', value, 'limit', limit, 'slack', slack, 'lam', lam);
 end
