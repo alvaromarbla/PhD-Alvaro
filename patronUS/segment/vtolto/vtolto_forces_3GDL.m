@@ -147,10 +147,14 @@ F.CL_wing = CL_wing; F.CD_wing = CD_wing; F.CM_wing = CM_wing;
 F.CL_tail = CL_tailwing; F.CD_tail = CD_tailwing; F.CM_tail = CM_tailwing;
 F.CL_fuselage = CL_fus; F.CD_fuselage = CD_fus; F.CM_fuselage = CM_fus;
 F.L_aero = L_aero; F.D_aero = D_aero;
+F.L_wing = L_wing; F.D_wing = D_wing;              % Wind axes, per surface
+F.L_fuselage = L_fus; F.D_fuselage = D_fus;
+F.L_tail = L_tailwing_wind; F.D_tail = D_tailwing_wind;
 F.D_nac1 = D_nac1; F.D_nac2 = D_nac2;
 F.alpha_nac1 = alpha_nac1; F.alpha_nac2 = alpha_nac2;
 F.vi1 = vi1;    F.vi2 = vi2;
 F.MA = MA_wing + MA_fus + MA_tail;
+F.MA_wing = MA_wing; F.MA_fus = MA_fus; F.MA_tail = MA_tail;
 F.M_Wing = M_Wing; F.M_Fus = M_Fus; F.M_Tail = M_Tail;
 F.M_Eng1 = M_Eng1; F.M_Eng2 = M_Eng2;
 F.M_Nac1 = M_Nac1; F.M_Nac2 = M_Nac2;

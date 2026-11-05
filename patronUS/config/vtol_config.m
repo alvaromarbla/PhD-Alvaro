@@ -21,6 +21,9 @@ if versions.AC_version == "2Wings"
     params.ocp.tf_ref = 10;                        % [s] Reference time (min-time objective scaling)
     params.ocp.reg_weight = 1e-3;                  % [-] Control-rate regulariser (control_rate_penalty), 0 = off
 
+    % Post-processing
+    params.post.animate = true;                    % Animation of forces/moments along the trajectory (Images/vtolto_animation.mp4)
+
     % Flat initial guess: built for each tf in the sweep, the feasible one
     % with the lowest objective feeds the first stage
     params.ocp.tf_sweep      = [5 10 15];          % [s]

@@ -181,6 +181,9 @@ end
 if solve_ok
     vtolto_plot_results(results, params)
     plot_constraint_activity(activity) % Multipliers and limits per node
+    if params.post.animate
+        vtolto_animate_results(results, params) % Forces and moments along the trajectory
+    end
 else
     warning('Skipping post-processing: no converged solution.');
 end
