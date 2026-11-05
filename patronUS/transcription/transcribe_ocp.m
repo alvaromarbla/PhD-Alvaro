@@ -5,6 +5,9 @@ function ocp = transcribe_ocp(vars, model, method, bounds)
 %     - path constraints of the segment at every node
 %     - boundary conditions x(0) = x0, x(tf) = xf from bounds.states (NaN = free)
 %       and, if present, xf_min <= x(tf) <= xf_max
+%     - terminal derivative conditions dx/dt(tf) = dxf, if present: with
+%       dxf = 0 on velocities and rates the final state is an equilibrium
+%       (trimmed), not just a point where the velocity crosses zero
 %   Defects and boundary conditions are divided by vars.x_scale so all
 %   states weigh alike in IPOPT. Output follows the cruise convention:
 %     ocp.c <= 0,  ocp.ceq == 0  with ceq = [defects; path ceq; boundary]
@@ -45,6 +48,9 @@ for i = 1:vars.nx
     if isfield(cfg, 'xf_min')
         bc_ineq{end+1, 1} = (cfg.xf_min - vars.X(i,end))/vars.x_scale(i); %#ok<AGROW>
         bc_ineq_names{end+1} = sprintf('%s(tf) >= %g', name, cfg.xf_min); %#ok<AGROW>
+    end
+    if isfield(cfg, 'dxf') && ~isnan(cfg.dxf)
+        bc{end+1, 1} = (Fk(i,end) - cfg.dxf)/vars.x_scale(i); %#ok<AGROW>
     end
 end
 bc      = vertcat(bc{:});

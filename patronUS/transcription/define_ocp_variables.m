@@ -7,7 +7,7 @@ function vars = define_ocp_variables(opti, bounds, N, method)
 %   Each field of bounds.states / bounds.controls defines one row of X / U,
 %   in fieldnames order, so adding/commenting a field in the config changes
 %   the problem (same idea as bounds.vars in cruise).
-%     bounds.states.<name>   = struct('min','max','x0','xf','init'[,'xf_min','xf_max'])
+%     bounds.states.<name>   = struct('min','max','x0','xf','init'[,'xf_min','xf_max','dxf'])
 %     bounds.controls.<name> = struct('min','max','init')
 %     bounds.time.tf         = struct('min','max','init')
 %   'init' is the initial guess: a scalar (constant) or [start end] (linear

@@ -10,8 +10,10 @@ function chk = check_ocp_guess(guess, dynamics_fcn, constraint_fcn, bounds, mode
 %     dyn_res:    max over states of |f(x,u) - dx/dt| / (x_scale/tf), with
 %                 dx/dt the numerical derivative of the guess and x_scale
 %                 the state scaling of define_ocp_variables
-%   chk.feasible is true when the first three are ~0 and dyn_res is below
-%   params.ocp.guess_dyn_tol.
+%     trim_viol:  terminal derivative conditions dxf (trimmed final state),
+%                 |f(x(tf),u(tf)) - dxf| with the same scaling as dyn_res
+%   chk.feasible is true when the first three are ~0 and dyn_res and
+%   trim_viol are below params.ocp.guess_dyn_tol.
 
 tol = 1e-6;
 
@@ -56,12 +58,17 @@ F_pts = model.F.map(n_pts);
 xdot_mod  = full(xdot_mod);
 path_viol = max([0; full(c(:)); abs(full(ceq(:)))]);
 
-dyn_res = 0;
+dyn_res   = 0;
+trim_viol = 0;
 for i = 1:numel(state_names)
     cfg = bounds.states.(state_names{i});
     xdot_num = derivative_2nd_order(guess.(state_names{i}), guess.t);
     scale    = max([abs(cfg.min), abs(cfg.max), 1])/guess.tf; % Same state scaling as the defects
     dyn_res  = max(dyn_res, max(abs(xdot_mod(i,:) - xdot_num))/scale);
+    if isfield(cfg, 'dxf') && ~isnan(cfg.dxf)
+        % Terminal trim with the model derivative: the guess must end in equilibrium
+        trim_viol = max(trim_viol, abs(xdot_mod(i,end) - cfg.dxf)/scale);
+    end
 end
 
 %% Output
@@ -70,8 +77,9 @@ chk.bound_viol = bound_viol;
 chk.bc_viol    = bc_viol;
 chk.path_viol  = path_viol;
 chk.dyn_res    = dyn_res;
+chk.trim_viol  = trim_viol;
 chk.feasible   = bound_viol <= tol && bc_viol <= tol && path_viol <= tol ...
-                 && dyn_res <= params.ocp.guess_dyn_tol;
+                 && dyn_res <= params.ocp.guess_dyn_tol && trim_viol <= params.ocp.guess_dyn_tol;
 
 end
 

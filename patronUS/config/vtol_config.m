@@ -33,14 +33,16 @@ if versions.AC_version == "2Wings"
 
     % States: x0/xf are the boundary conditions (NaN = free)
     % Optional xf_min/xf_max: inequality on the final state
+    % Optional dxf: final derivative (dxf = 0 on vx, vh, q: trimmed hover at tf,
+    % forces and pitching moment balanced, not just zero velocity)
     % init: scalar (constant guess) or [start end] (linear guess)
     % x, vx >= 0: no backwards flight (alpha in vtolto_forces_3GDL assumes u_b >= 0)
     bounds.states.x     = struct('min', 0,            'max', 200,             'x0', 0, 'xf', NaN,         'init', 0, 'xf_max', params.x_TO);
     bounds.states.h     = struct('min', 0,            'max', 1.2*params.h_to,  'x0', 0, 'xf', params.h_to, 'init', [0 params.h_to]);
-    bounds.states.vx    = struct('min', 0,         'max', 30,               'x0', 0, 'xf', 0,           'init', 0);
-    bounds.states.vh    = struct('min', -5,           'max', 10,               'x0', 0, 'xf', 0,           'init', params.h_to/tf_init);
+    bounds.states.vx    = struct('min', 0,         'max', 30,               'x0', 0, 'xf', 0,           'init', 0, 'dxf', 0);
+    bounds.states.vh    = struct('min', -5,           'max', 10,               'x0', 0, 'xf', 0,           'init', params.h_to/tf_init, 'dxf', 0);
     bounds.states.theta = struct('min', deg2rad(-20), 'max', deg2rad(20),      'x0', 0, 'xf', 0,           'init', 0);
-    bounds.states.q     = struct('min', -0.6,         'max', 0.6,              'x0', 0, 'xf', 0,           'init', 0); % Rad/s
+    bounds.states.q     = struct('min', -0.6,         'max', 0.6,              'x0', 0, 'xf', 0,           'init', 0, 'dxf', 0); % Rad/s
     bounds.states.E     = struct('min', 0,            'max', params.E_batt,    'x0', 0, 'xf', NaN,         'init', [0 0.01*params.E_batt]); % Consumed energy
 
     % Controls

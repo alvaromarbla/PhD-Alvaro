@@ -9,7 +9,7 @@ function [guess, sweep] = select_initial_guess(guess_fcn, tf_sweep, objective_fc
 
 guess = [];
 sweep = struct('tf', {}, 'obj', {}, 'feasible', {}, 'bound_viol', {}, ...
-               'bc_viol', {}, 'path_viol', {}, 'dyn_res', {});
+               'bc_viol', {}, 'path_viol', {}, 'dyn_res', {}, 'trim_viol', {});
 candidates = cell(1, numel(tf_sweep));
 
 for k = 1:numel(tf_sweep)
@@ -21,7 +21,7 @@ for k = 1:numel(tf_sweep)
     candidates{k} = g;
     sweep(k).tf  = tf_sweep(k);
     sweep(k).obj = full(objective_fcn(g, models, params));
-    for f = {'feasible', 'bound_viol', 'bc_viol', 'path_viol', 'dyn_res'}
+    for f = {'feasible', 'bound_viol', 'bc_viol', 'path_viol', 'dyn_res', 'trim_viol'}
         sweep(k).(f{1}) = chk.(f{1});
     end
 end
@@ -29,10 +29,10 @@ end
 %% Report
 
 fprintf('\nInitial guess sweep:\n');
-fprintf('   tf [s]   objective   feasible   bounds     BCs        path       dyn_res\n');
+fprintf('   tf [s]   objective   feasible   bounds     BCs        path       dyn_res    trim\n');
 for k = 1:numel(sweep)
-    fprintf('  %6.2f   %9.4f   %8d   %8.2e   %8.2e   %8.2e   %8.2e\n', sweep(k).tf, sweep(k).obj, ...
-        sweep(k).feasible, sweep(k).bound_viol, sweep(k).bc_viol, sweep(k).path_viol, sweep(k).dyn_res);
+    fprintf('  %6.2f   %9.4f   %8d   %8.2e   %8.2e   %8.2e   %8.2e   %8.2e\n', sweep(k).tf, sweep(k).obj, ...
+        sweep(k).feasible, sweep(k).bound_viol, sweep(k).bc_viol, sweep(k).path_viol, sweep(k).dyn_res, sweep(k).trim_viol);
 end
 
 %% Selection
