@@ -1,8 +1,9 @@
 function plot_constraint_activity(activity, max_rows)
 % Constraint activity per node (activity from report_constraint_activity).
 % One panel per constraint with at least one active node, sorted by
-% sum(lambda): left axis, the constrained quantity and its limit (bounds in
-% physical units, path constraints as the normalised c <= 0); right axis,
+% sum(lambda): left axis, the constrained quantity and its limit (bounds and
+% actuator rates in physical units, path constraints as the normalised
+% c <= 0); right axis,
 % the multiplier at each node. A node with lambda ~ 0 has slack; where
 % lambda > 0 the constraint binds, and its size says how much relaxing the
 % limit there would lower the objective.
@@ -28,7 +29,7 @@ for k = 1:n
     yyaxis left
     plot(r.t, r.value, '-o', 'LineWidth', 1.5, 'MarkerSize', 3);
     yline(r.limit, '--', 'LineWidth', 1.2);
-    if strcmp(r.kind, 'bound')
+    if any(strcmp(r.kind, {'bound', 'rate'}))
         ylabel(to_latex(strtok(r.name)));
     else
         ylabel('$c$');

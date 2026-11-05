@@ -8,6 +8,8 @@ function ocp = transcribe_ocp(vars, model, method, bounds)
 %     - terminal derivative conditions dx/dt(tf) = dxf, if present: with
 %       dxf = 0 on velocities and rates the final state is an equilibrium
 %       (trimmed), not just a point where the velocity crosses zero
+%     - actuator rate limits |du/dt| <= rate_max on controls that set
+%       rate_max (control_rate_constraints)
 %   Defects and boundary conditions are divided by vars.x_scale so all
 %   states weigh alike in IPOPT. Output follows the cruise convention:
 %     ocp.c <= 0,  ocp.ceq == 0  with ceq = [defects; path ceq; boundary]
@@ -56,9 +58,13 @@ end
 bc      = vertcat(bc{:});
 bc_ineq = vertcat(bc_ineq{:});
 
+%% Actuator rate limits
+
+[rate_c, ocp.rate_rows] = control_rate_constraints(vars, bounds);
+
 %% NLP constraints
 
-ocp.c   = [c_path(:); bc_ineq];
+ocp.c   = [c_path(:); bc_ineq; rate_c];
 ocp.ceq = [defects(:); ceq_path(:); bc];
 
 ocp.n_defects = vars.nx*N;
@@ -68,7 +74,8 @@ ocp.n_bc      = size(bc, 1);
 ocp.n_bc_ineq = size(bc_ineq, 1);
 ocp.bc_ineq       = bc_ineq;       % For report_constraint_activity
 ocp.bc_ineq_names = bc_ineq_names;
-ocp.n_ineq    = ocp.n_path_c + ocp.n_bc_ineq;
+ocp.n_rate    = size(rate_c, 1);
+ocp.n_ineq    = ocp.n_path_c + ocp.n_bc_ineq + ocp.n_rate;
 ocp.n_eq      = ocp.n_defects + ocp.n_path_eq + ocp.n_bc;
 
 %% Symbolic trajectory by name (for objectives)

@@ -14,14 +14,9 @@ if weight == 0
     return
 end
 
-if size(vars.Umn, 2) > 0
-    % Interleave nodes and midpoints: u_0, u_m0, u_1, u_m1, ..., u_N
-    seq = [reshape([vars.Un(:,1:end-1); vars.Umn], vars.nu, 2*vars.N), vars.Un(:,end)];
-else
-    seq = vars.Un;
-end
+[seq, tau] = control_sequence(vars);
 
-dtau = 1/(size(seq, 2) - 1);
+dtau = tau(2) - tau(1);
 dU   = seq(:,2:end) - seq(:,1:end-1);
 
 R = weight*sumsqr(dU)/dtau;

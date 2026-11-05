@@ -6,7 +6,8 @@ function chk = check_ocp_guess(guess, dynamics_fcn, constraint_fcn, bounds, mode
 %     bound_viol: state/control box bounds and tf bounds, as a fraction of
 %                 each variable's range
 %     bc_viol:    boundary conditions x0, xf (and xf_min/xf_max), same scaling
-%     path_viol:  max(c) and max|ceq| of constraint_fcn (raw units)
+%     path_viol:  max(c) and max|ceq| of constraint_fcn, and the actuator
+%                 rate limits |du/dt|/rate_max - 1 (all normalised)
 %     dyn_res:    max over states of |f(x,u) - dx/dt| / (x_scale/tf), with
 %                 dx/dt the numerical derivative of the guess and x_scale
 %                 the state scaling of define_ocp_variables
@@ -57,6 +58,15 @@ F_pts = model.F.map(n_pts);
 
 xdot_mod  = full(xdot_mod);
 path_viol = max([0; full(c(:)); abs(full(ceq(:)))]);
+
+% Actuator rate limits, normalised like control_rate_constraints
+for i = 1:numel(control_names)
+    cfg = bounds.controls.(control_names{i});
+    if isfield(cfg, 'rate_max') && ~isinf(cfg.rate_max)
+        rate = diff(guess.(control_names{i}))./diff(guess.t);
+        path_viol = max(path_viol, max(abs(rate))/cfg.rate_max - 1);
+    end
+end
 
 dyn_res   = 0;
 trim_viol = 0;

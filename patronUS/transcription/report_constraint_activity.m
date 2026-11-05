@@ -3,11 +3,13 @@ function activity = report_constraint_activity(value_fcn, opti, vars, model, ocp
 %   Each constraint of the OCP is one NLP constraint per node (and per
 %   midpoint for bounds on Hermite-Simpson midpoint controls), each with
 %   its own multiplier. For every path constraint row, final-state
-%   inequality and variable bound (lower and upper side separately) this
+%   inequality, actuator rate limit and variable bound (lower and upper
+%   side separately) this
 %   keeps the per-node arrays and summarises them:
 %     t, value, limit: the constrained quantity at each node and its limit.
-%                Bounds in physical units; path rows and final-state
-%                inequalities as the normalised constraint c (limit 0).
+%                Bounds and actuator rates (at interval centres) in
+%                physical units; path rows and final-state inequalities
+%                as the normalised constraint c (limit 0).
 %     slack:     distance to the limit, normalised (path rows by their
 %                limit, bounds by the variable range).
 %     lam:       multiplier per node: sensitivity of the objective to the
@@ -30,11 +32,13 @@ N1 = vars.N + 1;
 
 rows = struct([]);
 
-%% Path constraints and final-state inequalities (con_ineq = [c_path(:); bc_ineq])
+%% Path constraints, final-state inequalities and actuator rates
+% con_ineq = [c_path(:); bc_ineq; rate limits]
 
 lam_c    = full(value_fcn(opti.dual(con_ineq)));
 lam_path = reshape(lam_c(1:model.n_c*N1), model.n_c, N1);
-lam_bc   = lam_c(model.n_c*N1+1:end);
+lam_bc   = lam_c(model.n_c*N1 + (1:ocp.n_bc_ineq));
+lam_rate = lam_c(model.n_c*N1 + ocp.n_bc_ineq + 1:end);
 
 for k = 1:model.n_c
     c = results.c_path(k,:);
@@ -43,6 +47,11 @@ end
 for k = 1:numel(ocp.bc_ineq_names)
     c = full(value_fcn(ocp.bc_ineq(k)));
     rows = [rows, make_row(ocp.bc_ineq_names{k}, 'final', t(end), c, 0, -c, lam_bc(k))]; %#ok<AGROW>
+end
+for r = ocp.rate_rows
+    rate  = full(value_fcn(r.rate));          % Physical rate between control points
+    slack = 1 - rate/r.limit;                 % Normalised by the limit
+    rows  = [rows, make_row(r.name, 'rate', r.tau*results.tf, rate, r.limit, slack, lam_rate(r.idx)')]; %#ok<AGROW>
 end
 
 %% Variable bounds

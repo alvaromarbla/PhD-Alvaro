@@ -46,10 +46,14 @@ if versions.AC_version == "2Wings"
     bounds.states.E     = struct('min', 0,            'max', params.E_batt,    'x0', 0, 'xf', NaN,         'init', [0 0.01*params.E_batt]); % Consumed energy
 
     % Controls
-    bounds.controls.epsilon1 = struct('min', deg2rad(0), 'max', deg2rad(110),      'init', deg2rad(90));
-    bounds.controls.epsilon2 = struct('min', deg2rad(0), 'max', deg2rad(110),      'init', deg2rad(90));
-    bounds.controls.n1       = struct('min', 10,         'max', params.prop.max_rps, 'init', 50);
-    bounds.controls.n2       = struct('min', 10,         'max', params.prop.max_rps, 'init', 50);
+    % Optional rate_max: actuator rate limit |du/dt| <= rate_max (control_rate_constraints)
+    % PLACEHOLDERS, to check with the servo and motor datasheets
+    rate_tilt = deg2rad(45);                       % [rad/s] Tilt servo slew rate
+    rate_rps  = 50;                                % [rps/s] Motor spin-up/down rate
+    bounds.controls.epsilon1 = struct('min', deg2rad(0), 'max', deg2rad(110),      'init', deg2rad(90), 'rate_max', rate_tilt);
+    bounds.controls.epsilon2 = struct('min', deg2rad(0), 'max', deg2rad(110),      'init', deg2rad(90), 'rate_max', rate_tilt);
+    bounds.controls.n1       = struct('min', 10,         'max', params.prop.max_rps, 'init', 50,         'rate_max', rate_rps);
+    bounds.controls.n2       = struct('min', 10,         'max', params.prop.max_rps, 'init', 50,         'rate_max', rate_rps);
     % bounds.controls.deltae = struct('min', deg2rad(-20), 'max', deg2rad(20), 'init', 0); % Not in the tail model yet
 
     % Final time
