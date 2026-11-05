@@ -48,19 +48,22 @@ T_tot = hypot(Tx, Th);
 
 epsilon = min(max(atan2(Th, Tx) - ths.p, C.epsilon1.min), C.epsilon1.max);
 
-% Differential thrust to trim the moment:
-% (T1-T2)*sin(eps)*xtw - (T1+T2)*cos(eps)*ztw = Iyy*thetaddot - M_aero
+% Thrust split to trim the moment, with the rotor arms of M_Eng1/M_Eng2 in
+% vtolto_forces_3GDL (rotor 1 at xw, rotor 2 at -xtw, both at ztw; H = 0):
+% T1*sin(eps)*xw - T2*sin(eps)*xtw - (T1+T2)*cos(eps)*ztw = Iyy*thetaddot - M_aero
+g = params.geo;
 M_aero = F.MA + F.M_Wing + F.M_Fus + F.M_Tail;
 M_req  = params.Iyy*ths.dd - M_aero;
-dT   = zeros(1, n_pts);
+T1   = T_tot/2;
 trim = abs(sin(epsilon)) > 0.2;
-dT(trim) = (M_req(trim) + T_tot(trim).*cos(epsilon(trim))*params.geo.ztw) ...
-           ./(sin(epsilon(trim))*params.geo.xtw);
-dT = min(max(dT, -0.9*T_tot), 0.9*T_tot);
+T1(trim) = (M_req(trim) + T_tot(trim).*(cos(epsilon(trim))*g.ztw + sin(epsilon(trim))*g.xtw)) ...
+           ./(sin(epsilon(trim))*(g.xw + g.xtw));
+T1 = min(max(T1, 0.05*T_tot), 0.95*T_tot);
+T2 = T_tot - T1;
 
 phi = F.alpha + epsilon;
-n1 = thrust_to_rps((T_tot + dT)/2, F.V, phi, C.n1, models, params);
-n2 = thrust_to_rps((T_tot - dT)/2, F.V, phi, C.n2, models, params);
+n1 = thrust_to_rps(T1, F.V, phi, C.n1, models, params);
+n2 = thrust_to_rps(T2, F.V, phi, C.n2, models, params);
 
 % Power with the inverted controls
 F = eval_forces(F_pts, xs.d, hs.d, ths.p, epsilon, epsilon, n1, n2);

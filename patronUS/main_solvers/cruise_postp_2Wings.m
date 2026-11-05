@@ -144,8 +144,8 @@ results.M_Wing = results.L_wing* cos(results.alpha)*params.geo.xw -results.L_win
 results.M_Tail = - results.L_tailwing_wind*cos(results.alpha)*params.geo.xtw - results.L_tailwing_wind*sin(results.alpha)*params.geo.ztw...
     -results.D_tailwing_wind*sin(results.alpha)*params.geo.xtw + results.D_tailwing_wind*cos(results.alpha)*params.geo.ztw; % Tail wing contribution
 
-results.M_Eng1 = results.T1*sin(results.opt.epsilon1)*params.geo.xtw - results.T1*cos(results.opt.epsilon1)*params.geo.ztw ...
-    + results.H1*cos(results.opt.epsilon1)*params.geo.xtw + results.H1*sin(results.opt.epsilon1)*params.geo.ztw;
+results.M_Eng1 = results.T1*sin(results.opt.epsilon1)*params.geo.xw - results.T1*cos(results.opt.epsilon1)*params.geo.ztw ... % Rotor 1 at the wing station (xw)
+    + results.H1*cos(results.opt.epsilon1)*params.geo.xw + results.H1*sin(results.opt.epsilon1)*params.geo.ztw;
 
 results.M_Eng2 = -results.T2*sin(results.opt.epsilon2)*params.geo.xtw - results.T2*cos(results.opt.epsilon2)*params.geo.ztw ...
     - results.H2*cos(results.opt.epsilon2)*params.geo.xtw + results.H2*sin(results.opt.epsilon2)*params.geo.ztw;

@@ -38,15 +38,16 @@ W = params.mass*params.g;
 
 %% Points of application (body axes: x forward, z up, origin at the CG)
 % As used by the moment equation of vtolto_forces_3GDL (r x F of each
-% term): rotors at (+-xtw, ztw), wing at (xw, zw), tail at (-xtw, ztw).
-% Nacelle drag is drawn at its rotor and fuselage forces at (xfus, zfus).
+% term): rotor 1 at (xw, ztw), rotor 2 at (-xtw, ztw), wing at (xw, zw),
+% tail at (-xtw, ztw). Nacelle drag is drawn at its rotor and fuselage
+% forces at (xfus, zfus).
 
 g  = params.geo;
 st.cg    = [0; 0];
 st.wing  = [g.xw;   g.zw];
 st.fus   = [g.xfus; g.zfus];
 st.tail  = [-g.xtw; g.ztw];
-st.prop1 = [g.xtw;  g.ztw];
+st.prop1 = [g.xw;   g.ztw];
 st.prop2 = [-g.xtw; g.ztw];
 
 %% Forces in inertial axes at frame k: {label, station, colour, @(k) [Fx; Fz]}
