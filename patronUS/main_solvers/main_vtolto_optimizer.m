@@ -182,6 +182,7 @@ end
 
 if solve_ok
     vtolto_plot_results(results, params)
+    plot_model_maps(results.dbg, models, 'vtolto_model_maps', results.t) % Trajectory on the CT/CP maps and CL/CD polars
     vtolto_plot_battery(results, params) % Shepherd battery only
     plot_constraint_activity(activity) % Multipliers and limits per node
     if params.post.animate

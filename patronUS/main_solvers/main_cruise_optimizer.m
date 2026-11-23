@@ -150,6 +150,7 @@ if solve_ok
     elseif  versions.AC_version == "2Wings"
     if exist('dbg','var')
         [results] = cruise_postp_2Wings_dbg(sol_obj,X_struct,dbg,params,fval);
+        plot_model_maps(results, models, 'cruise_model_maps') % Steady point on the CT/CP maps and CL/CD polars
     else
         [results, checks, aux] = cruise_postp_2Wings(sol_obj, X_struct, models, params, fval,versions);
     end
@@ -213,5 +214,6 @@ if strcmp(params.batt.model, 'Shepherd')
 
     cruise_plot_soc(res_soc, params, guess)
     vtolto_plot_battery(res_soc, params, 'cruise_battery')
+    plot_model_maps(res_soc.dbg, models, 'cruise_soc_model_maps', res_soc.t)
 
 end
