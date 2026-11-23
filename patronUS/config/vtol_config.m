@@ -16,8 +16,12 @@ if versions.AC_version == "2Wings"
     params.x_TO  = 2;                            % [m] Max horizontal displacement at the end of the take-off
     params.V_eps = 0.5;                            % [m/s] Airspeed regularisation at hover
 
-    % Transcription
-    params.ocp.N      = 40;                        % Number of collocation intervals
+    % Battery (ideal or Shepherd pack, params.batt): set by battery_config
+    % inside cruise_config, with versions.Batt_version
+
+    % Transcription (drops the settings of the time-dependent cruise)
+    params.ocp        = struct();
+    params.ocp.N      = 40;                       % Number of collocation intervals
     params.ocp.tf_ref = 10;                        % [s] Reference time (min-time objective scaling)
     params.ocp.reg_weight = 1e-3;                  % [-] Control-rate regulariser (control_rate_penalty), 0 = off
 
@@ -44,6 +48,10 @@ if versions.AC_version == "2Wings"
     bounds.states.theta = struct('min', deg2rad(-20), 'max', deg2rad(20),      'x0', 0, 'xf', 0,           'init', 0);
     bounds.states.q     = struct('min', -0.6,         'max', 0.6,              'x0', 0, 'xf', 0,           'init', 0, 'dxf', 0); % Rad/s
     bounds.states.E     = struct('min', 0,            'max', params.E_batt,    'x0', 0, 'xf', NaN,         'init', [0 0.01*params.E_batt]); % Consumed energy
+    if strcmp(params.batt.model, 'Shepherd')
+        SOC0 = params.batt.SOC0;
+        bounds.states.SOC = struct('min', 0.05, 'max', 1, 'x0', SOC0, 'xf', NaN, 'init', [SOC0 SOC0 - 0.02]); % State of charge
+    end
 
     % Controls
     % Optional rate_max: actuator rate limit |du/dt| <= rate_max (control_rate_constraints)

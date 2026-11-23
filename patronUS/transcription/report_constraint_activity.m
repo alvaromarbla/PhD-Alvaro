@@ -38,7 +38,8 @@ rows = struct([]);
 lam_c    = full(value_fcn(opti.dual(con_ineq)));
 lam_path = reshape(lam_c(1:model.n_c*N1), model.n_c, N1);
 lam_bc   = lam_c(model.n_c*N1 + (1:ocp.n_bc_ineq));
-lam_rate = lam_c(model.n_c*N1 + ocp.n_bc_ineq + 1:end);
+lam_rate = lam_c(model.n_c*N1 + ocp.n_bc_ineq + (1:ocp.n_rate));
+% Midpoint path rows (Hermite-Simpson) follow; they are not reported here
 
 for k = 1:model.n_c
     c = results.c_path(k,:);

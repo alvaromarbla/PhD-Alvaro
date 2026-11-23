@@ -99,3 +99,35 @@ else
     warning('AC version unknown')
 
 end
+
+%% Battery model: ideal energy store or Shepherd pack (versions.Batt_version)
+% The Shepherd pack replaces the reference battery above (mass and energy)
+
+params = battery_config(params, versions);
+
+%% Time-dependent cruise (Shepherd battery, 2Wings)
+% With the Shepherd model the range for a given charge is no longer
+% eta*E*V/P: the current needed for a power grows as SOC drops, so the
+% cruise is an optimal control problem in time (main_cruise_optimizer):
+% the trim of bounds.vars is imposed at every node (quasi-steady, the
+% variables become controls), and the states are the range x, the bus
+% energy E and SOC, from SOC0 down to SOC_f, with tf free.
+
+if strcmp(params.batt.model, 'Shepherd') && versions.AC_version == "2Wings"
+
+    params.cruise.SOC_f   = 0.3;                   % [-] End of cruise: 10 % descent, transition and landing + 20 % safety reserve
+    params.ocp.N          = 20;                    % Number of collocation intervals
+    params.ocp.reg_weight = 1e-3;                  % [-] Control-rate regulariser (control_rate_penalty), 0 = off
+    params.ocp.x_ref      = 100e3;                 % [m] Range scaling of the objective
+
+    SOC0 = params.batt.SOC0;
+    bounds.states.x   = struct('min', 0,    'max', 500e3,         'x0', 0,    'xf', NaN,                 'init', [0 60e3]);  % Range
+    bounds.states.E   = struct('min', 0,    'max', params.E_batt, 'x0', 0,    'xf', NaN,                 'init', [0 0.7*params.E_batt]); % Bus energy drawn
+    bounds.states.SOC = struct('min', 0.05, 'max', 1,             'x0', SOC0, 'xf', params.cruise.SOC_f, 'init', [SOC0 params.cruise.SOC_f]);
+
+    bounds.controls = bounds.vars;                 % Trim variables, free at every node
+
+    % scale: tf/scale is the decision variable (cruise lasts ~1 h)
+    bounds.time.tf = struct('min', 60, 'max', 6*3600, 'init', 3600, 'scale', 3600);
+
+end

@@ -46,7 +46,12 @@ if method.midpoints
 else
     vars.Umn = MX(vars.nu, 0);
 end
-vars.tf = opti.variable();
+% Final time: tf/tf_scale is the decision variable (optional
+% bounds.time.tf.scale, default 1, for segments that last much longer than 1 s)
+vars.tf_scale = 1;
+if isfield(bounds.time.tf, 'scale'), vars.tf_scale = bounds.time.tf.scale; end
+vars.tfn = opti.variable();
+vars.tf  = vars.tf_scale*vars.tfn;
 
 vars.X  = diag(vars.x_scale)*vars.Xn;
 vars.U  = diag(vars.u_scale)*vars.Un;
@@ -89,9 +94,9 @@ end
 %% Final time
 
 cfg = bounds.time.tf;
-vars.con.tf = (cfg.min <= vars.tf <= cfg.max);
+vars.con.tf = (cfg.min/vars.tf_scale <= vars.tfn <= cfg.max/vars.tf_scale);
 opti.subject_to(vars.con.tf);
-opti.set_initial(vars.tf, cfg.init);
+opti.set_initial(vars.tfn, cfg.init/vars.tf_scale);
 
 %% Flat decision vector in physical units (iteration history / bound slack)
 % Layout: [X(:); U(:); Um(:); tf], column-major (node by node)

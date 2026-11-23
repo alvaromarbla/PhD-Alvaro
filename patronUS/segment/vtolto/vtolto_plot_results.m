@@ -1,5 +1,8 @@
-function vtolto_plot_results(res, params)
+function vtolto_plot_results(res, params, name)
 % Results page of the VTOL take-off (res from unpack_ocp_solution)
+% name: output PDF in Images/ (default 'vtolto_results')
+
+if nargin < 3, name = 'vtolto_results'; end
 
 t = res.t;
 
@@ -41,6 +44,6 @@ pos = get(vtoltoFig,'Position');
 set(vtoltoFig,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
 targetFolder = fullfile(fileparts(fileparts(fileparts(mfilename('fullpath')))), 'Images');
 if ~isfolder(targetFolder), mkdir(targetFolder); end
-print(vtoltoFig, fullfile(targetFolder, 'vtolto_results'),'-dpdf','-vector','-fillpage')
+print(vtoltoFig, fullfile(targetFolder, name),'-dpdf','-vector','-fillpage')
 
 end

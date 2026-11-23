@@ -26,6 +26,6 @@ for i = 1:vars.nu
     end
 end
 
-opti.set_initial(vars.tf, guess.tf);
+opti.set_initial(vars.tfn, guess.tf/vars.tf_scale);
 
 end

@@ -2,7 +2,10 @@ function ocp = transcribe_ocp(vars, model, method, bounds)
 %TRANSCRIBE_OCP Transcribe the continuous OCP into constraints on the discrete variables.
 %   On the uniform grid t_k = tau_k*tf, h = tf/N, it builds:
 %     - collocation defects with method.defects (trapezoidal, Hermite-Simpson, ...)
-%     - path constraints of the segment at every node
+%     - path constraints of the segment at every node, and at the interval
+%       midpoints (x_m, u_m) of schemes that have them (Hermite-Simpson):
+%       otherwise the free midpoint controls can violate binding limits
+%       between nodes
 %     - boundary conditions x(0) = x0, x(tf) = xf from bounds.states (NaN = free)
 %       and, if present, xf_min <= x(tf) <= xf_max
 %     - terminal derivative conditions dx/dt(tf) = dxf, if present: with
@@ -16,6 +19,8 @@ function ocp = transcribe_ocp(vars, model, method, bounds)
 %   ocp.traj holds the symbolic node histories by name (plus t, tf) and is
 %   what the objective functions receive.
 
+import casadi.*
+
 N = vars.N;
 h = vars.tf/N;
 
@@ -26,8 +31,19 @@ F_nodes = model.F.map(N+1);
 
 %% Collocation defects
 
-defects = method.defects(model.F, vars, Fk, h);
+[defects, Xm] = method.defects(model.F, vars, Fk, h);
 defects = defects ./ repmat(vars.x_scale, 1, N);
+
+%% Path constraints at the midpoints
+
+c_mid   = MX(0, 1);
+ceq_mid = MX(0, 1);
+if ~isempty(Xm)
+    F_mid = model.F.map(N);
+    [~, c_m, ceq_m] = F_mid(Xm, vars.Um);
+    c_mid   = c_m(:);
+    ceq_mid = ceq_m(:);
+end
 
 %% Boundary conditions
 
@@ -64,8 +80,10 @@ bc_ineq = vertcat(bc_ineq{:});
 
 %% NLP constraints
 
-ocp.c   = [c_path(:); bc_ineq; rate_c];
-ocp.ceq = [defects(:); ceq_path(:); bc];
+% Midpoint rows go last, so the node rows keep the layout that
+% report_constraint_activity reads
+ocp.c   = [c_path(:); bc_ineq; rate_c; c_mid];
+ocp.ceq = [defects(:); ceq_path(:); bc; ceq_mid];
 
 ocp.n_defects = vars.nx*N;
 ocp.n_path_c  = model.n_c*(N+1);
@@ -75,8 +93,10 @@ ocp.n_bc_ineq = size(bc_ineq, 1);
 ocp.bc_ineq       = bc_ineq;       % For report_constraint_activity
 ocp.bc_ineq_names = bc_ineq_names;
 ocp.n_rate    = size(rate_c, 1);
-ocp.n_ineq    = ocp.n_path_c + ocp.n_bc_ineq + ocp.n_rate;
-ocp.n_eq      = ocp.n_defects + ocp.n_path_eq + ocp.n_bc;
+ocp.n_path_c_mid  = size(c_mid, 1);
+ocp.n_path_eq_mid = size(ceq_mid, 1);
+ocp.n_ineq    = ocp.n_path_c + ocp.n_bc_ineq + ocp.n_rate + ocp.n_path_c_mid;
+ocp.n_eq      = ocp.n_defects + ocp.n_path_eq + ocp.n_bc + ocp.n_path_eq_mid;
 
 %% Symbolic trajectory by name (for objectives)
 

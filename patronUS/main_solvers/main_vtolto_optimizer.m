@@ -24,7 +24,9 @@ versions.CT_version    = 'analytical'; % CT model to use
 versions.CP_version    = 'analytical'; % CP model to use
 versions.CH_version    = 'zeros'; % CH model to use
 
-versions.Batt_version = ' '; % Battery model to use
+% Battery model: ' ' (ideal energy store, state E) or 'Shepherd' (adds the
+% state of charge SOC, voltage sag and battery power/cut-off limits)
+versions.Batt_version = 'Shepherd'; % Battery model to use
 
 % Versions for dynamics
 % To choose among: "VTOL_2Wings"
@@ -35,8 +37,8 @@ versions.dynamics = "VTOL_2Wings";
 versions.constraints = "VTOL_2Wings";
 
 % Versions for objective
-% To choose among: "min_energy_vtol", "min_time_vtol"
-versions.objective = "min_energy_vtol";
+% To choose among: "min_energy_vtol", "min_time_vtol", "min_soc_vtol" (Shepherd only)
+versions.objective = "min_soc_vtol";
 
 % Versions for initial guess (of the first stage)
 % To choose among: "config" (guess in vtol_config), "flat_2Wings" (differential flatness)
@@ -180,6 +182,7 @@ end
 
 if solve_ok
     vtolto_plot_results(results, params)
+    vtolto_plot_battery(results, params) % Shepherd battery only
     plot_constraint_activity(activity) % Multipliers and limits per node
     if params.post.animate
         vtolto_animate_results(results, params) % Forces and moments along the trajectory

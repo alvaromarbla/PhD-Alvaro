@@ -22,7 +22,16 @@ versions.CT_version    = 'analytical'; % CT model to use
 versions.CP_version    = 'analytical'; % CP model to use
 versions.CH_version    = 'zeros'; % CH model to use
 
-versions.Batt_version = ' '; % Battery model to use
+% Battery model: ' ' (ideal energy store, steady cruise only) or 'Shepherd'.
+% With 'Shepherd' the steady optimum is followed by the time-dependent
+% cruise: maximum range from SOC0 to SOC_f (cruise_config), with the trim
+% imposed at every node (2Wings only)
+versions.Batt_version = 'Shepherd'; % Battery model to use
+
+% Shepherd only: dynamics and transcription of the time-dependent cruise
+% To choose among: "Cruise_2Wings" / "trapezoidal", "hermite_simpson"
+versions.dynamics      = "Cruise_2Wings";
+versions.transcription = "trapezoidal";
 
 % Versions for constraints
 % To choose among: 1Wing, 1Wing_Nacelle, 2Wings
@@ -164,3 +173,45 @@ history_matrix = hist.X_hist;
 plotIpoptconvergence(history_matrix, bounds);
 plotVariableEvolution(hist.X_hist, bounds);
 plotConvergenceMetrics(stats, viol, slack);
+
+%% Time-dependent cruise with the Shepherd battery
+% Maximum range for the charge between SOC0 and SOC_f. The steady optimum
+% above (ideal-battery objective, min P/V) held constant is the initial
+% guess; the optimiser may then change the trim as the voltage drops.
+
+if strcmp(params.batt.model, 'Shepherd')
+
+    if versions.AC_version ~= "2Wings"
+        error('main_cruise_optimizer:shepherd', 'The time-dependent cruise is only set up for 2Wings.');
+    end
+
+    fns.dynamics    = registry.dynamics(char(versions.dynamics));
+    fns.constraints = @(Z, m, p, b) cruise_path_constraints(constraint_fcn, Z, m, p, b);
+    fns.objective   = registry.objective('max_range_soc');
+    method          = registry.transcription(char(versions.transcription));
+
+    if solve_ok, val = @(e) full(sol_obj.value(e)); else, val = @(e) full(opti.debug.value(e)); end
+    trim = struct();
+    for i = 1:n_vars
+        trim.(var_names{i}) = val(X_struct.(var_names{i}));
+    end
+    P_bus_steady = val(dbg.P1 + dbg.P2)/params.prop.eff;
+    guess = cruise_soc_guess(trim, P_bus_steady, params, bounds);
+
+    [res_soc, info_soc] = ocp_ipopt_stage(params, bounds, models, fns, method, guess, 5);
+
+    fprintf('\nTime-dependent cruise (Shepherd, SOC %.2f -> %.2f): %s, %d iterations, %.1f s\n', ...
+            params.batt.SOC0, params.cruise.SOC_f, info_soc.status, info_soc.iterations, info_soc.time);
+    fprintf('  Range: %.2f km in %.1f min (steady trim held: %.2f km in %.1f min, %+.2f %%)\n', ...
+            res_soc.x(end)/1e3, res_soc.tf/60, guess.x(end)/1e3, guess.tf/60, ...
+            100*(res_soc.x(end)/guess.x(end) - 1));
+    fprintf('  V: %.2f -> %.2f m/s   P_bus: %.0f -> %.0f W   U: %.1f -> %.1f V   I: %.1f -> %.1f A\n', ...
+            res_soc.V(1), res_soc.V(end), res_soc.dbg.P_bus(1), res_soc.dbg.P_bus(end), ...
+            res_soc.dbg.U_batt(1), res_soc.dbg.U_batt(end), res_soc.dbg.I_batt(1), res_soc.dbg.I_batt(end));
+    fprintf('  Bus energy drawn: %.0f Wh; ideal battery with that energy at the steady optimum: %.2f km\n', ...
+            res_soc.E(end)/3600, res_soc.E(end)*trim.V/P_bus_steady/1e3);
+
+    cruise_plot_soc(res_soc, params, guess)
+    vtolto_plot_battery(res_soc, params, 'cruise_battery')
+
+end

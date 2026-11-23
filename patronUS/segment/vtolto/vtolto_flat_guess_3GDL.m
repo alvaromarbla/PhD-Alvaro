@@ -82,6 +82,22 @@ guess.theta = ths.p;
 guess.q     = ths.d;
 guess.E     = cumtrapz(t, P/params.prop.eff);
 
+% Shepherd battery: integrate the state of charge along the power history
+% (trapezoidal, same model as the dynamics)
+if strcmp(params.batt.model, 'Shepherd')
+    P_bus = P/params.prop.eff;
+    SOC   = zeros(1, n_pts);
+    SOC(1) = params.batt.SOC0;
+    for k = 1:n_pts-1
+        dt  = t(k+1) - t(k);
+        Ik  = battery_shepherd(P_bus(k), SOC(k), params.batt);
+        SOC_pred = SOC(k) - dt*Ik.I/params.batt.Q;
+        Ik1 = battery_shepherd(P_bus(k+1), SOC_pred, params.batt);
+        SOC(k+1) = SOC(k) - 0.5*dt*(Ik.I + Ik1.I)/params.batt.Q;
+    end
+    guess.SOC = SOC;
+end
+
 guess.epsilon1 = epsilon;
 guess.epsilon2 = epsilon;
 guess.n1       = n1;

@@ -38,4 +38,14 @@ dbg.c_names = {'CT1 >= 0', 'CT2 >= 0', 'CP1 >= 0', 'CP2 >= 0', ...
                'J1 <= 1.2', 'J2 <= 1.2', ...
                'phi1 <= 90 deg', 'phi1 >= -90 deg', 'phi2 <= 90 deg', 'phi2 >= -90 deg'};
 
+% Shepherd battery: it must be able to deliver the demanded power
+% (real current, disc >= 0) without dropping below its cut-off voltage
+if strcmp(params.batt.model, 'Shepherd')
+    batt = battery_shepherd((F.P1 + F.P2)/params.prop.eff, Z.SOC, params.batt);
+    c = [c;
+        -batt.disc/batt.U_oc^2;
+         1 - batt.U/params.batt.V_cut];
+    dbg.c_names = [dbg.c_names, {'battery power', 'U_batt >= V_cut'}];
+end
+
 end
