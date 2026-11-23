@@ -199,7 +199,8 @@ if strcmp(params.batt.model, 'Shepherd')
     P_bus_steady = val(dbg.P1 + dbg.P2)/params.prop.eff;
     guess = cruise_soc_guess(trim, P_bus_steady, params, bounds);
 
-    [res_soc, info_soc] = ocp_ipopt_stage(params, bounds, models, fns, method, guess, 5);
+    [res_soc, info_soc] = ocp_ipopt_stage(params, bounds, models, fns, method, guess, ...
+                                          struct('print_level', 5, 'activity', true));
 
     fprintf('\nTime-dependent cruise (Shepherd, SOC %.2f -> %.2f): %s, %d iterations, %.1f s\n', ...
             params.batt.SOC0, params.cruise.SOC_f, info_soc.status, info_soc.iterations, info_soc.time);
@@ -212,8 +213,15 @@ if strcmp(params.batt.model, 'Shepherd')
     fprintf('  Bus energy drawn: %.0f Wh; ideal battery with that energy at the steady optimum: %.2f km\n', ...
             res_soc.E(end)/3600, res_soc.E(end)*trim.V/P_bus_steady/1e3);
 
-    cruise_plot_soc(res_soc, params, guess)
-    vtolto_plot_battery(res_soc, params, 'cruise_battery')
+    % Generic post-processing on the flight history (same functions as the VTOL take-off)
+    fh = flight_history(res_soc, params, 'cruise');
+    plot_trajectory_results(fh, params) % Images/cruise_results.pdf
+    cruise_plot_soc(res_soc, params, guess) % Against the steady trim held constant
+    plot_battery_results(fh, params) % Images/cruise_battery.pdf
     plot_model_maps(res_soc.dbg, models, 'cruise_soc_model_maps', res_soc.t)
+    plot_constraint_activity(info_soc.activity, [], 'cruise_constraint_activity') % Multipliers and limits per node
+    if params.post.animate
+        animate_trajectory(fh, params) % Images/cruise_animation.mp4, 12 s at 10 fps (opts.duration, opts.fps)
+    end
 
 end

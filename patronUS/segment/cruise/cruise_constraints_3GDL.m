@@ -185,7 +185,10 @@ c = [-V/(n1*params.prop.diameter)  ; ...
      J2-1.2];
 
 if nargout > 2
-    dbg.alpha = alpha;         dbg.phi1 = phi1;        dbg.phi2 = phi2;
+    % Row labels of c (report_constraint_activity)
+    dbg.c_names = {'J1 >= 0', 'J2 >= 0', 'CT1 >= 0', 'CT2 >= 0', 'CP1 >= 0', 'CP2 >= 0', ...
+                   'T1 <= T_max', 'T2 <= T_max', 'P1 <= P_max', 'P2 <= P_max', 'J1 <= 1.2', 'J2 <= 1.2'};
+    dbg.alpha = alpha;        dbg.phi1 = phi1;        dbg.phi2 = phi2;
     dbg.xi_dw = xi_dw;
     dbg.J1    = J1;            dbg.J2 = J2;
     dbg.n1 = n1;                dbg.n2 = n2;

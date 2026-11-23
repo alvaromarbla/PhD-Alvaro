@@ -1,5 +1,6 @@
-function vtolto_animate_results(res, params, opts)
-% Animation of the VTOL take-off from the solution trajectory.
+function animate_trajectory(fh, params, opts)
+% Animation of a trajectory segment (VTOL take-off, time-dependent cruise,
+% or a multiphase history) from its flight history (fh from flight_history).
 % Left: the aircraft, pitched by theta with the nacelles tilted by
 % epsilon1/2 (CAD side views if fuselage_sideview.png and
 % nacelle_sideview.png are on the path, grey boxes otherwise), with every
@@ -7,34 +8,49 @@ function vtolto_animate_results(res, params, opts)
 % (aero moment of each surface at its station, net moment at the CG).
 % Right: the trajectory with the current position. Bottom: force and
 % moment time histories with a time cursor.
-% Arrows share one scale over the whole take-off, and so do arcs, so their
-% evolution is comparable between frames. Saved as Images/vtolto_animation.mp4.
-%   res:  results from unpack_ocp_solution (states, controls and dbg forces)
-%   opts: fps (25), speed (1 = real time, 0.5 = half speed), save (true),
-%         play (true: real-time pauses when the figure is visible)
+% Arrows share one scale over the whole trajectory, and so do arcs, so their
+% evolution is comparable between frames. Saved as Images/<name>.mp4.
+%   opts: fps (25, or 10 for segments longer than 60 s),
+%         speed (1 = real time, 0.5 = half speed; default 1),
+%         duration [s] of the video for segments longer than 60 s (e.g. a
+%         cruise), which sets the speed (default 12 s),
+%         save (true), play (true: real-time pauses when the figure is
+%         visible), name (default [fh.segment '_animation'])
+% Every frame is rendered and captured (~0.7 s each in batch), so long
+% segments default to 12 s at 10 fps: 120 frames, ~1.5 min.
 
 if nargin < 3, opts = struct(); end
-if ~isfield(opts, 'fps'),   opts.fps   = 25;   end
-if ~isfield(opts, 'speed'), opts.speed = 1;    end
+long = fh.tf > 60;
+if ~isfield(opts, 'fps'),      opts.fps      = 25 - 15*long; end
+if ~isfield(opts, 'duration'), opts.duration = 12;           end
+if ~isfield(opts, 'speed')
+    opts.speed = 1;
+    if long, opts.speed = fh.tf/opts.duration; end
+end
 if ~isfield(opts, 'save'),  opts.save  = true; end
 if ~isfield(opts, 'play'),  opts.play  = true; end
+if ~isfield(opts, 'name'),  opts.name  = [fh.segment '_animation']; end
 
 %% Data at the frame times
 
-tq = 0:opts.speed/opts.fps:res.tf;
-if tq(end) < res.tf, tq(end+1) = res.tf; end
+tq = fh.t(1):opts.speed/opts.fps:fh.t(end);
+if tq(end) < fh.t(end), tq(end+1) = fh.t(end); end
 n_frames = numel(tq);
 
 S = struct();
-for f = {'x', 'h', 'theta', 'epsilon1', 'epsilon2'}
-    S.(f{1}) = interp1(res.t, res.(f{1}), tq);
-end
-for f = {'V', 'gamma', 'T1', 'T2', 'H1', 'H2', 'D_nac1', 'D_nac2', 'alpha_nac1', 'alpha_nac2', ...
-         'L_wing', 'D_wing', 'L_fuselage', 'D_fuselage', 'L_tail', 'D_tail', ...
-         'MA_wing', 'MA_fus', 'MA_tail', 'M'}
-    S.(f{1}) = interp1(res.t, res.dbg.(f{1}), tq);
+for f = {'x', 'h', 'theta', 'epsilon1', 'epsilon2', 'V', 'gamma', 'T1', 'T2', 'H1', 'H2', ...
+         'D_nac1', 'D_nac2', 'alpha_nac1', 'alpha_nac2', 'L_wing', 'D_wing', 'L_fus', 'D_fus', ...
+         'L_tail', 'D_tail', 'MA_wing', 'MA_fus', 'MA_tail', 'M'}
+    S.(f{1}) = interp1(fh.t, fh.(f{1}), tq);
 end
 W = params.mass*params.g;
+
+% Time in seconds, or minutes for long segments (cruise)
+t_div = 1; t_unit = 's';
+if fh.t(end) > 120, t_div = 60; t_unit = 'min'; end
+% Path in metres, or kilometres when it is long
+x_div = 1; x_unit = 'm';
+if range(fh.x) > 2e3, x_div = 1e3; x_unit = 'km'; end
 
 %% Points of application (body axes: x forward, z up, origin at the CG)
 % As used by the moment equation of vtolto_forces_3GDL (r x F of each
@@ -65,8 +81,8 @@ forces = {
     'Nacelle 2 drag',  'prop2', [0.85 0.60 0.1], @(k) nac(S.D_nac2(k), S.theta(k) + S.epsilon2(k) - S.alpha_nac2(k))
     'Wing lift',       'wing',  [0 0.55 0],    @(k) S.L_wing(k)*wind_L(k)
     'Wing drag',       'wing',  [0.85 0 0],    @(k) S.D_wing(k)*wind_D(k)
-    'Fuselage lift',   'fus',   [0.3 0.75 0.3], @(k) S.L_fuselage(k)*wind_L(k)
-    'Fuselage drag',   'fus',   [0.95 0.35 0.35], @(k) S.D_fuselage(k)*wind_D(k)
+    'Fuselage lift',   'fus',   [0.3 0.75 0.3], @(k) S.L_fus(k)*wind_L(k)
+    'Fuselage drag',   'fus',   [0.95 0.35 0.35], @(k) S.D_fus(k)*wind_D(k)
     'Tail lift',       'tail',  [0.1 0.45 0.3], @(k) S.L_tail(k)*wind_L(k)
     'Tail drag',       'tail',  [0.6 0.15 0.15], @(k) S.D_tail(k)*wind_D(k)
     };
@@ -94,7 +110,7 @@ m_radius = [0.15 0.15 0.15 0.28];
 
 %% Figure layout
 
-animFig = figure('Name', 'VTOL take-off animation', 'Color', 'w', 'Position', [60 60 1400 860]);
+animFig = figure('Name', ['Animation: ' opts.name], 'Color', 'w', 'Position', [60 60 1400 860]);
 axBody = axes(animFig, 'Position', [0.05 0.33 0.58 0.62]);
 axTraj = axes(animFig, 'Position', [0.70 0.33 0.27 0.62]);
 axF    = axes(animFig, 'Position', [0.05 0.06 0.40 0.18]);
@@ -125,44 +141,57 @@ legend(axBody, [h_force; h_moment(:,1)], 'Location', 'eastoutside', 'FontSize', 
 h_title = title(axBody, '');
 
 % Trajectory
-hold(axTraj, 'on'); grid(axTraj, 'on'); box(axTraj, 'on'); axis(axTraj, 'equal');
-plot(axTraj, res.x, res.h, ':', 'Color', [0.6 0.6 0.6]);
+% Trajectory (x in m or km); equal axes only when x and h are comparable
+xs = fh.x/x_div;
+hold(axTraj, 'on'); grid(axTraj, 'on'); box(axTraj, 'on');
+plot(axTraj, xs, fh.h, ':', 'Color', [0.6 0.6 0.6]);
 h_path  = plot(axTraj, NaN, NaN, 'b-', 'LineWidth', 1.5);
 h_glyph = plot(axTraj, NaN, NaN, 'k-', 'LineWidth', 3);
 h_pos   = plot(axTraj, NaN, NaN, 'ro', 'MarkerFaceColor', 'r');
-x_pad = max(3, 0.15*range(res.h));
-xlim(axTraj, [min(res.x) - x_pad, max(res.x) + x_pad]);
-ylim(axTraj, [min(res.h) - 1, max(res.h) + 2]);
-xlabel(axTraj, 'x [m]'); ylabel(axTraj, 'h [m]'); title(axTraj, 'Trajectory');
-glyph_len = 0.08*range(res.h);
+if x_div == 1
+    axis(axTraj, 'equal');
+    x_pad = max(3, 0.15*range(fh.h));
+    xlim(axTraj, [min(xs) - x_pad, max(xs) + x_pad]);
+    ylim(axTraj, [min(fh.h) - 1, max(fh.h) + 2]);
+    glyph_x = 0.08*max(range(fh.h), 10);
+    glyph_h = glyph_x;
+else
+    x_pad = 0.05*range(xs);
+    h_pad = max(10, 0.15*range(fh.h));
+    xlim(axTraj, [min(xs) - x_pad, max(xs) + x_pad]);
+    ylim(axTraj, [min(fh.h) - h_pad, max(fh.h) + h_pad]);
+    glyph_x = 0.06*range(xs);                     % Glyph drawn in axis units, so its
+    glyph_h = 0.06*diff(ylim(axTraj));            % angle reads as theta on screen
+end
+xlabel(axTraj, ['x [' x_unit ']']); ylabel(axTraj, 'h [m]'); title(axTraj, 'Trajectory');
 
 % Time histories (at the nodes)
-d = res.dbg;
+ts = fh.t/t_div;
 hold(axF, 'on'); grid(axF, 'on'); box(axF, 'on');
-plot(axF, res.t, d.T1, 'Color', forces{2,3}, 'LineWidth', 1.5);
-plot(axF, res.t, d.T2, 'Color', forces{3,3}, 'LineWidth', 1.5);
-plot(axF, res.t, d.L_aero, 'Color', [0 0.55 0], 'LineWidth', 1.5);
-plot(axF, res.t, d.D_aero + d.D_nac1 + d.D_nac2, 'Color', [0.85 0 0], 'LineWidth', 1.5);
+plot(axF, ts, fh.T1, 'Color', forces{2,3}, 'LineWidth', 1.5);
+plot(axF, ts, fh.T2, 'Color', forces{3,3}, 'LineWidth', 1.5);
+plot(axF, ts, fh.L_aero, 'Color', [0 0.55 0], 'LineWidth', 1.5);
+plot(axF, ts, fh.D_aero + fh.D_nac1 + fh.D_nac2, 'Color', [0.85 0 0], 'LineWidth', 1.5);
 yline(axF, W, 'k--');
 legend(axF, 'T_1', 'T_2', 'Aero lift', 'Aero + nacelle drag', 'Weight', 'Location', 'eastoutside', 'FontSize', 8);
-xlabel(axF, 't [s]'); ylabel(axF, 'Force [N]');
-cur_F = xline(axF, 0, 'k-', 'LineWidth', 1.2, 'HandleVisibility', 'off');
+xlabel(axF, ['t [' t_unit ']']); ylabel(axF, 'Force [N]');
+cur_F = xline(axF, ts(1), 'k-', 'LineWidth', 1.2, 'HandleVisibility', 'off');
 
 hold(axM, 'on'); grid(axM, 'on'); box(axM, 'on');
-plot(axM, res.t, d.M_Eng1 + d.M_Eng2, 'Color', forces{2,3}, 'LineWidth', 1.5);
-plot(axM, res.t, d.MA + d.M_Wing + d.M_Fus + d.M_Tail, 'Color', [0 0.55 0], 'LineWidth', 1.5);
-plot(axM, res.t, d.M_Nac1 + d.M_Nac2, 'Color', forces{4,3}, 'LineWidth', 1.5);
-plot(axM, res.t, d.M, 'k--', 'LineWidth', 1.5);
+plot(axM, ts, fh.M_Eng1 + fh.M_Eng2, 'Color', forces{2,3}, 'LineWidth', 1.5);
+plot(axM, ts, fh.MA + fh.M_Wing + fh.M_Fus + fh.M_Tail, 'Color', [0 0.55 0], 'LineWidth', 1.5);
+plot(axM, ts, fh.M_Nac1 + fh.M_Nac2, 'Color', forces{4,3}, 'LineWidth', 1.5);
+plot(axM, ts, fh.M, 'k--', 'LineWidth', 1.5);
 legend(axM, 'Rotors', 'Aero', 'Nacelles', 'Net (I_{yy} dq/dt)', 'Location', 'eastoutside', 'FontSize', 8);
-xlabel(axM, 't [s]'); ylabel(axM, 'Pitching moment [N m]');
-cur_M = xline(axM, 0, 'k-', 'LineWidth', 1.2, 'HandleVisibility', 'off');
+xlabel(axM, ['t [' t_unit ']']); ylabel(axM, 'Pitching moment [N m]');
+cur_M = xline(axM, ts(1), 'k-', 'LineWidth', 1.2, 'HandleVisibility', 'off');
 
 %% Video
 
 if opts.save
-    targetFolder = fullfile(fileparts(fileparts(fileparts(mfilename('fullpath')))), 'Images');
+    targetFolder = fullfile(fileparts(fileparts(mfilename('fullpath'))), 'Images');
     if ~isfolder(targetFolder), mkdir(targetFolder); end
-    video = VideoWriter(fullfile(targetFolder, 'vtolto_animation'), 'MPEG-4');
+    video = VideoWriter(fullfile(targetFolder, opts.name), 'MPEG-4');
     video.FrameRate = opts.fps;
     open(video);
 end
@@ -190,15 +219,16 @@ for k = 1:n_frames
         set(h_moment(j,2), 'XData', head(1,:), 'YData', head(2,:));
     end
 
-    set(h_title, 'String', sprintf(['t = %.2f s    V = %.1f m/s    h = %.1f m    ' ...
+    set(h_title, 'String', sprintf(['t = %.2f %s    V = %.1f m/s    h = %.1f m    ' ...
         '\\theta = %.1f\\circ    \\epsilon_1 = %.0f\\circ    \\epsilon_2 = %.0f\\circ'], ...
-        tq(k), S.V(k), S.h(k), rad2deg(th), rad2deg(S.epsilon1(k)), rad2deg(S.epsilon2(k))));
+        tq(k)/t_div, t_unit, S.V(k), S.h(k), rad2deg(th), rad2deg(S.epsilon1(k)), rad2deg(S.epsilon2(k))));
 
-    set(h_path,  'XData', S.x(1:k), 'YData', S.h(1:k));
-    set(h_pos,   'XData', S.x(k),   'YData', S.h(k));
-    set(h_glyph, 'XData', S.x(k) + glyph_len*[-1 1]*cos(th)/2, 'YData', S.h(k) + glyph_len*[-1 1]*sin(th)/2);
-    cur_F.Value = tq(k);
-    cur_M.Value = tq(k);
+    xk = S.x/x_div;
+    set(h_path,  'XData', xk(1:k), 'YData', S.h(1:k));
+    set(h_pos,   'XData', xk(k),   'YData', S.h(k));
+    set(h_glyph, 'XData', xk(k) + glyph_x*[-1 1]*cos(th)/2, 'YData', S.h(k) + glyph_h*[-1 1]*sin(th)/2);
+    cur_F.Value = tq(k)/t_div;
+    cur_M.Value = tq(k)/t_div;
 
     drawnow;
     if opts.save, writeVideo(video, getframe(animFig)); end
@@ -207,7 +237,7 @@ end
 
 if opts.save
     close(video);
-    fprintf('Animation saved to %s.mp4\n', fullfile(targetFolder, 'vtolto_animation'));
+    fprintf('Animation saved to %s.mp4\n', fullfile(targetFolder, opts.name));
 end
 
 end

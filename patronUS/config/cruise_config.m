@@ -119,6 +119,7 @@ if strcmp(params.batt.model, 'Shepherd') && versions.AC_version == "2Wings"
     params.ocp.N          = 20;                    % Number of collocation intervals
     params.ocp.reg_weight = 1e-3;                  % [-] Control-rate regulariser (control_rate_penalty), 0 = off
     params.ocp.x_ref      = 100e3;                 % [m] Range scaling of the objective
+    params.post.animate   = false;                 % Animation of forces/moments along the cruise (Images/cruise_animation.mp4, ~2.5 min to render)
 
     SOC0 = params.batt.SOC0;
     bounds.states.x   = struct('min', 0,    'max', 500e3,         'x0', 0,    'xf', NaN,                 'init', [0 60e3]);  % Range

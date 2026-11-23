@@ -106,7 +106,13 @@ up  = reshape(lam(n+1:end), 1, []);
 end
 
 function rows = bound_rows(name, t, vals, lam_lo, lam_up, cfg)
-span = max(cfg.max - cfg.min, eps);
+% A fixed variable (min == max, e.g. gamma = 0 in cruise) is an equality,
+% not an inequality: its multipliers are not an activity measure
+if cfg.max == cfg.min
+    rows = struct([]);
+    return
+end
+span = cfg.max - cfg.min;
 rows = [make_row(sprintf('%s >= %g', name, cfg.min), 'bound', t, vals, cfg.min, (vals - cfg.min)/span, lam_lo), ...
         make_row(sprintf('%s <= %g', name, cfg.max), 'bound', t, vals, cfg.max, (cfg.max - vals)/span, lam_up)];
 end

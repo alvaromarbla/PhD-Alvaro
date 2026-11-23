@@ -181,12 +181,14 @@ end
 %% Post-processing (last stage)
 
 if solve_ok
-    vtolto_plot_results(results, params)
+    % Generic post-processing on the flight history (same functions as the cruise)
+    fh = flight_history(results, params, 'vtolto');
+    plot_trajectory_results(fh, params) % Images/vtolto_results.pdf
     plot_model_maps(results.dbg, models, 'vtolto_model_maps', results.t) % Trajectory on the CT/CP maps and CL/CD polars
-    vtolto_plot_battery(results, params) % Shepherd battery only
-    plot_constraint_activity(activity) % Multipliers and limits per node
+    plot_battery_results(fh, params) % Shepherd battery only
+    plot_constraint_activity(activity, [], 'vtolto_constraint_activity') % Multipliers and limits per node
     if params.post.animate
-        vtolto_animate_results(results, params) % Forces and moments along the trajectory
+        animate_trajectory(fh, params) % Forces and moments along the trajectory (Images/vtolto_animation.mp4)
     end
 else
     warning('Skipping post-processing: no converged solution.');

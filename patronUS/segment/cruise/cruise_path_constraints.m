@@ -10,15 +10,19 @@ function [c, ceq, dbg] = cruise_path_constraints(steady_fcn, Z, models, params, 
 
 [c, ceq, dbg] = steady_fcn(Z, models, params, bounds);
 
+% Row labels of c (report_constraint_activity): those of the steady
+% function if it gives them
+if ~isfield(dbg, 'c_names')
+    dbg.c_names = arrayfun(@(k) sprintf('trim c%d', k), 1:size(c, 1), 'UniformOutput', false);
+end
+
 if strcmp(params.batt.model, 'Shepherd')
     P_bus = (dbg.P1 + dbg.P2)/params.prop.eff;
     batt  = battery_shepherd(P_bus, Z.SOC, params.batt);
     c = [c;
          -batt.disc/batt.U_oc^2;
          1 - batt.U/params.batt.V_cut];
-    n_steady = size(c, 1) - 2;
-    dbg.c_names = [arrayfun(@(k) sprintf('trim c%d', k), 1:n_steady, 'UniformOutput', false), ...
-                   {'battery power', 'U_batt >= V_cut'}];
+    dbg.c_names = [dbg.c_names, {'battery power', 'U_batt >= V_cut'}];
 end
 
 end
